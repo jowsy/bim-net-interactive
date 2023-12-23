@@ -1,7 +1,5 @@
 using DotNet.Interactive.Extensions.Revit;
 using FluentAssertions;
-
-//using FluentAssertions;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.CSharp;
@@ -32,22 +30,22 @@ namespace RevitExtensionTests {
 
             extension.OnLoadAsync(_kernel.FindKernelByName("csharp"));
 
-            process = new Process
+            /*process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "C:\\git\\interactive-revitkernel\\interactive-revitkernel\\DispatcherConsole\\bin\\Debug\\DispatcherConsole.exe",
+                    FileName = "..\\..\\..\\..\\DispatcherConsole\\bin\\Debug\\DispatcherConsole.exe",
                     UseShellExecute = true,
                     CreateNoWindow = false
                 }
             };
-            process.Start();
+            process.Start();*/
         }
 
         [Fact]
         public async Task CSharpKernel_sends_code_to_dispatcher()
         {
-            bool dirtyFlag = false;
+          
             string codeToSubmit = @"
 #!revit2023
 int e = 10;";
@@ -64,7 +62,7 @@ int e = 10;";
         [Fact]
         public void Dispose()
         {
-            process.CloseMainWindow();
+            process.Kill();
             GC.SuppressFinalize(this);
         }
     }

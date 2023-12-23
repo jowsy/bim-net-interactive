@@ -16,7 +16,7 @@ namespace DispatcherConsole
             while (true)
             {
                 using (var pipe = new NamedPipeServerStream(
-                "revitdispatcher2023",
+                "revitdispatcher2024",
                 PipeDirection.InOut,
                 NamedPipeServerStream.MaxAllowedServerInstances,
                 PipeTransmissionMode.Message))
@@ -33,33 +33,6 @@ namespace DispatcherConsole
                     var response = Encoding.UTF8.GetBytes("Hello on the other side !");
                     pipe.Write(response, 0, response.Length);
 
-                    /*var processStartInfo = new ProcessStartInfo
-                    {
-                        FileName = "cmd.exe",
-                        Arguments = "/c " + line,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false
-                    };
-                    try
-                    {
-                        var process = Process.Start(processStartInfo);
-                        var output = process.StandardOutput.ReadToEnd();
-                        output += process.StandardError.ReadToEnd();
-                        process.WaitForExit();
-                        if (string.IsNullOrEmpty(output))
-                        {
-                            output = "\n";
-                        }
-                        var response = Encoding.UTF8.GetBytes(output);
-                        pipe.Write(response, 0, response.Length);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                        var response = Encoding.UTF8.GetBytes(ex.Message);
-                        pipe.Write(response, 0, response.Length);
-                    }*/
                 }
 
             }

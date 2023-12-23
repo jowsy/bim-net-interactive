@@ -36,18 +36,30 @@ namespace DotNet.Interactive.Extensions.Revit
                         {
                             try
                             {
-                                using (var pipe = new NamedPipeClientStream("localhost", $"revitdispatcher{revitVersion}", PipeDirection.InOut))
-                                {
-                                    pipe.Connect(10000);
-                                    pipe.ReadMode = PipeTransmissionMode.Message;
+                                RevitConnectorService connectorService = new RevitConnectorService();
+                                connectorService.Send(submitCode.Code);
 
-                                    var input = submitCode.Code;
-                                    byte[] bytes = Encoding.Default.GetBytes(input);
-                                    pipe.Write(bytes, 0, bytes.Length);
-                                    var result = ReadMessage(pipe);
-                                    context.DisplayStandardOut(Encoding.UTF8.GetString(result));
-                                  
+                                using (var pipe = new NamedPipeServerStream(
+                                "revitdispatcher2024",
+                                PipeDirection.InOut,
+                                NamedPipeServerStream.MaxAllowedServerInstances,
+                                PipeTransmissionMode.Message))
+                                {
+
+                                    Console.WriteLine("[*] Waiting for client connection...");
+                                    pipe.WaitForConnection();
+                                    Console.WriteLine("[*] Client connected.");
+
+                                    var messageBytes = ReadMessage(pipe);
+                                    var line = Encoding.UTF8.GetString(messageBytes);
+                                    Console.WriteLine("[*] Received: {0}", line);
+                                    context.DisplayStandardOut(line);
+                                    //if (line.ToLower() == "exit") return;
+                                    //var response = Encoding.UTF8.GetBytes("Hello on the other side !");
+                                    //pipe.Write(response, 0, response.Length);
+
                                 }
+
                             }catch(TimeoutException)
                             {
                                 context.Fail(submitCode, message: "Could not reach revit connector. Timeout.");

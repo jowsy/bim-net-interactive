@@ -21,4 +21,8 @@
 	<PackageReference Include="FluentAssertions" Version="6.10.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DotNet.Interactive.Extensions.Revit\DotNet.Interactive.Extensions.Revit.csproj" />
+  </ItemGroup>
+
 </Project>

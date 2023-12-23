@@ -1,0 +1,10 @@
+<RevitAddIns>
+    <AddIn Type="Application">
+        <Name>CQBimRevitConnector</Name>
+        <Assembly>Sweco.Revit.CQBimRevitConnector.dll</Assembly>
+        <AddInId>641F5BA4-4AED-4AA3-8689-C5315BF469DF</AddInId>
+        <FullClassName>Sweco.Revit.CQBimRevitConnector.App</FullClassName>
+        <VendorId>Sweco AB</VendorId>
+        <VendorDescription>Sweco AB</VendorDescription>
+    </AddIn>
+</RevitAddIns>
