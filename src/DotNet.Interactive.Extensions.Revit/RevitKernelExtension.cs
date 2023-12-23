@@ -20,7 +20,7 @@ namespace DotNet.Interactive.Extensions.Revit
             {
                 if (kernel is CSharpKernel cSharpKernel)
                 {
-                    cSharpKernel.UseRevit("2023");
+                    cSharpKernel.UseRevit("2024");
                 }
             });
             /*

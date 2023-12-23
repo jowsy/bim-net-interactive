@@ -37,10 +37,12 @@ namespace DotNet.Interactive.Extensions.Revit
                             try
                             {
                                 RevitConnectorService connectorService = new RevitConnectorService();
-                                connectorService.Send(submitCode.Code);
+
+                                
+                                connectorService.Send(submitCode.Code.Replace($"#!revit{revitVersion}",""));
 
                                 using (var pipe = new NamedPipeServerStream(
-                                "revitdispatcher2024",
+                                $"revitdispatcher{revitVersion}",
                                 PipeDirection.InOut,
                                 NamedPipeServerStream.MaxAllowedServerInstances,
                                 PipeTransmissionMode.Message))

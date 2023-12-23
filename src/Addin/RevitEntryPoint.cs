@@ -159,11 +159,8 @@ namespace Sweco.Revit.CQBimRevitConnector;
         {
 
 
-
-        // Ends up here upon responding (if event does not fail)
-        // Action variable is read here to decide what to do, App variable is used as Entry point to Revit
-
         //string Str = Conversions.ToString(Action.ActionData); // We know it is a string
+        string response;
         try
         {
             var service = new CodeDomService();
@@ -173,21 +170,22 @@ namespace Sweco.Revit.CQBimRevitConnector;
             if (runnable == null) throw new Exception("broke");
             runnable.Execute(App);
 
-            Autodesk.Revit.UI.TaskDialog.Show("Command was created", "");
-        }catch(Exception ex)
+            response = "Code were successfully compiled and executed in the Revit thread.";
+        }
+        catch(Exception ex)
         {
 
-            Autodesk.Revit.UI.TaskDialog.Show("Command was not created", "");
+            response = "Compilation failed: \n" + ex.ToString();
         }
 
 
+        //Send response back to Visual Studio Code
         using (var pipe = new NamedPipeClientStream("localhost", $"revitdispatcher2024", PipeDirection.InOut))
         {
             pipe.Connect(5000);
             pipe.ReadMode = PipeTransmissionMode.Message;
 
-            var input = "test";
-            byte[] bytes = Encoding.Default.GetBytes(input);
+            byte[] bytes = Encoding.Default.GetBytes(response);
             pipe.Write(bytes, 0, bytes.Length);
             var result = ReadMessage(pipe);
            
