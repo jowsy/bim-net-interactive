@@ -1,7 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.Connection;
@@ -9,8 +7,13 @@ using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.Events;
 using Microsoft.DotNet.Interactive.Formatting;
 using Microsoft.DotNet.Interactive.ValueSharing;
+using System;
+using System.Collections.Generic;
 using System.IO.Pipes;
+using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Jo.Interactive.Extensions.Revit
 {
@@ -19,11 +22,12 @@ namespace Jo.Interactive.Extensions.Revit
                                IKernelCommandHandler<SubmitCode>, 
                                IKernelCommandHandler<RequestValue>, 
                                IKernelCommandHandler<SendValue>,
-                               IKernelCommandHandler<RequestValueInfos>
+                               IKernelCommandHandler<RequestValueInfos>,
+                               IKernelCommandHandler<RequestHoverText>
     {
-        private readonly Dictionary<string, object> _variables = new(StringComparer.InvariantCultureIgnoreCase);
+        private readonly Dictionary<string, object> _variables = new Dictionary<string, object>();
 
-        private ScriptOptions _scriptOptions;
+        //private ScriptOptions _scriptOptions;
   
          
         public RevitKernel(string name) : base(name)
@@ -60,7 +64,9 @@ namespace Jo.Interactive.Extensions.Revit
 
         public Task HandleAsync(SubmitCode command, KernelInvocationContext context)
         {
-            throw new NotImplementedException();
+            context.DisplayStandardOut("Yoyoyo");
+            context.Complete(command);
+            return Task.CompletedTask;
         }
 
         Task IKernelCommandHandler<RequestValue>.HandleAsync(RequestValue command, KernelInvocationContext context)
@@ -118,7 +124,7 @@ namespace Jo.Interactive.Extensions.Revit
             await SetValueAsync(command, context, SetValueAsync);
         }
 
-        private Task SetValueAsync(string valueName, object value, Type? declaredType = null)
+        private Task SetValueAsync(string valueName, object value, Type declaredType = null)
         {
             _variables[valueName] = value;
             return Task.CompletedTask;
@@ -127,6 +133,20 @@ namespace Jo.Interactive.Extensions.Revit
         public Task HandleAsync(RequestValueInfos command, KernelInvocationContext context)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task HandleAsync(RequestHoverText command, KernelInvocationContext context)
+        {
+            //var text = await document.GetTextAsync(context.CancellationToken);
+            var code = command.Code;
+
+            context.Publish(
+                new HoverTextProduced(
+                    command,
+                    new[]
+                    {
+                        new FormattedValue("text/markdown", "hej")
+                    }));
         }
 
         /* public Task HandleAsync(SubmitCode command, KernelInvocationContext context)

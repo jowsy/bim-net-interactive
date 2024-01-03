@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <Version>1.32.0</Version>
+	  <Version>1.51.0</Version>
   </PropertyGroup>
 
 	<PropertyGroup>
@@ -20,7 +20,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.DotNet.Interactive" Version="1.0.0-beta.23102.2" />
-	  <PackageReference Include="Microsoft.DotNet.Interactive.CSharp" Version="1.0.0-beta.23102.2" />
+		<PackageReference Include="microsoft.dotnet.interactive" Version="1.0.0-beta.23611.1" />
+		<PackageReference Include="microsoft.dotnet.interactive.csharp" Version="1.0.0-beta.23611.1" />
+		<PackageReference Include="microsoft.dotnet.interactive.formatting" Version="1.0.0-beta.23611.1" />
 	</ItemGroup>
 </Project>
