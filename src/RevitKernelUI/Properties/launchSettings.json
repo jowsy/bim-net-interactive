@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "RevitKernel": {
+      "commandName": "Project"
+    },
+    "Profile 1": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files\\Autodesk\\Revit 2024\\Revit.exe"
+    }
+  }
+}

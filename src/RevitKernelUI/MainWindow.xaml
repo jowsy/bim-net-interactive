@@ -7,22 +7,37 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         Title="Revit Kernel Dispatcher" Height="450" Width="800">
-    <Window.DataContext>
-        <local:ViewModel/>
-    </Window.DataContext>
-    <Grid Margin="5">
+
+    <Grid Margin="0">
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="24px"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <fa:ImageAwesome  Icon="Connectdevelop" VerticalAlignment="Center" Width="20" Spin="True" SpinDuration="4" Margin="5"/>
+            <!--<fa:ImageAwesome  Icon="Connectdevelop" VerticalAlignment="Center" Width="20" Spin="True" SpinDuration="4" Margin="5"/>-->
             <TextBlock Text="Kernel is running" VerticalAlignment="Center"/>
         </StackPanel>
-        <DataGrid Margin="0,5,0,0" RowHeaderWidth="16" 
-                 Grid.Row="1" Grid.Column="2"
-                 CanUserAddRows="False"
-                 ItemsSource="{Binding Path=KernelCommands}"/>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="400"/>
+            </Grid.ColumnDefinitions>
+            <DataGrid Margin="0,5,0,0" RowHeaderWidth="16" 
+             Grid.Column="0"
+             Padding="5"
+             CanUserAddRows="False"
+             ItemsSource="{Binding Path=KernelCommands}"/>
+
+            <DataGrid Margin="0,5,0,0" RowHeaderWidth="16" 
+           Grid.Column="2"
+           Padding="5"
+           CanUserAddRows="False"
+           ItemsSource="{Binding Path=Variables}"/>    
+        </Grid>
+    
         
     </Grid>
 </Window>

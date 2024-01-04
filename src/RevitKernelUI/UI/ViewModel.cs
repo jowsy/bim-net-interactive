@@ -7,11 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.CommandLine;
+using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +22,7 @@ using System.Windows.Threading;
 
 namespace RevitKernelUI
 {
-    public class ViewModel : ViewModelBase
+    public class ViewModel : ViewModelBase, IDisposable
     {
         private const string NamedPipeName = "revit-kernel-2014-pipe";
         private ObservableCollection<CommandViewItem> _kernelCommands = new ObservableCollection<CommandViewItem>();
@@ -34,19 +37,30 @@ namespace RevitKernelUI
             }
         }
 
+        private ObservableCollection<VariableViewItem> _variables = new ObservableCollection<VariableViewItem>();
+        public ObservableCollection<VariableViewItem> Variables
+        {
+            get { return _variables; }
+            set
+            {
+                _variables = value;
+                OnPropertyChanged(nameof(Variables));
+            }
+        }
 
-        public ViewModel() {
 
-      
+        public ViewModel(Autodesk.Revit.UI.UIApplication uiApp) {
+
             _variablesStore = new Variables();
             _variablesStore.VariablesChanged += _variablesStore_VariablesChanged;
 
             _kernel = new CompositeKernel();
+            
 
             //Perkele! 
             _kernel.KernelEvents.ObserveOn(SynchronizationContext.Current).Subscribe(new KernelObserver(this), new System.Threading.CancellationToken());
-            var revitKernel = new RevitKernel("RevitKernel", _variablesStore);
-
+            var revitKernel = new RevitKernel("RevitKernel", _variablesStore, uiApp);
+          
             _kernel.Add(revitKernel);
             revitKernel.UseValueSharing();
             
@@ -75,7 +89,11 @@ namespace RevitKernelUI
 
         private void _variablesStore_VariablesChanged(object sender, EventArgs e)
         {
-            
+            Variables = new ObservableCollection<VariableViewItem>(_variablesStore.GetVariables()
+                                                                                  .Select(v => new VariableViewItem() 
+                                                                                                { Name = v.Key, 
+                                                                                                Value = v.Value?.ToString()
+                                                                                  }));
         }
 
         private void SetUpNamedPipeKernelConnection()
@@ -105,6 +123,11 @@ namespace RevitKernelUI
                 var _host = host.ConnectAsync();
 
             });
+        }
+
+        public void Dispose()
+        {
+            _kernel.Dispose();
         }
     }
 

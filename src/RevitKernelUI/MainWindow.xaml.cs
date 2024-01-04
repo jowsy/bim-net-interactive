@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +22,11 @@ namespace RevitKernelUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(UIApplication uiApp)
         {
             InitializeComponent();
-        }
+
+            DataContext = new ViewModel(uiApp);
+;        }
     }
 }

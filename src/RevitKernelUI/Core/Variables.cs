@@ -17,15 +17,15 @@ namespace RevitKernelUI
 
         public void Add(string name, object value)
         {
-            _variables.TryGetValue(name, out value);
+            
 
-            if (value == null)
+            if (!_variables.ContainsKey(name))
             {
                 _variables.Add(name, value);
                 VariablesChanged.Invoke(this, EventArgs.Empty);
                 return;
             }
-
+            
             _variables[name] = value;
             VariablesChanged.Invoke(this, EventArgs.Empty);
         }
