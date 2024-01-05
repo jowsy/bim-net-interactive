@@ -1,4 +1,5 @@
-# Scripting BIM as a polygot
+# NET Interactive Revit Kernel
+**Bringing Literal Programming to Autodesk Revit**
 
 ## Background
 
