@@ -53,7 +53,7 @@ namespace RevitKernel
         {
             try
             {
-                if (args.Name.ToLower().Contains("system.diagnostics.diagnosticsource"))
+                if (args.Name.ToLower().Contains("system.diagnostics.diagnosticsource") || args.Name.Contains("System.Reflection.Metadata") || args.Name.Contains("Microsoft.CodeAnalysis"))
                 {
                     string filename = Path.GetDirectoryName(typeof(ViewModel).Assembly.Location);
 

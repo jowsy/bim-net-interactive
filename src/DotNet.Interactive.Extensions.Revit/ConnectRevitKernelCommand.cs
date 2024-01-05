@@ -1,4 +1,5 @@
 ﻿using Microsoft.DotNet.Interactive;
+using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.Connection;
 using System;
 using System.Collections.Generic;
@@ -35,12 +36,22 @@ namespace DotNet.Interactive.Extensions.Revit
             var localName = commandLineContext.ParseResult.GetValueForOption(KernelNameOption);
 
             var proxyKernel = await connector.CreateKernelAsync(localName!);
+            proxyKernel.AddMiddleware(async (KernelCommand command, KernelInvocationContext context, KernelPipelineContinuation next) =>
+            {
+                if (command is SubmitCode)
+                {
+                    context.DisplayStandardOut("compile it here! Yikes!!");
+                }
+            
 
+                await next(command, context);
+                
+            });
             proxyKernel.UseValueSharing();
 
             //Add support for sendvalue
             proxyKernel.KernelInfo.SupportedKernelCommands.Add(new KernelCommandInfo("SendValue"));
-
+            
             return new ProxyKernel[] { proxyKernel };
         }
 

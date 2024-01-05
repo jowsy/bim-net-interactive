@@ -2,9 +2,12 @@
 using Autodesk.Revit.UI;
 using IRevitKernel.Core;
 using Microsoft.DotNet.Interactive;
+using RevitKernelUI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +25,10 @@ namespace RevitKernel.Core
             {
             try
             {
+
+                //AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(ResolveDlls);
+
+
                 IsRunning = true;
                 UIDocument uidoc = uiapp.ActiveUIDocument;
                 if (null == uidoc)
@@ -30,9 +37,9 @@ namespace RevitKernel.Core
                 }
                 try
     {
-                    var service = new CodeDomService();
-                    var newCommand = service.CreateCommand(KernelContext, (string)SubmitCode);
-
+                    //var service = new RoslynCompilerService();
+                    //var newCommand = service.CreateCommand(KernelContext, (string)SubmitCode);
+                    var newCommand = Assembly.LoadFrom("C:\\Users\\sejsau\\AppData\\Local\\revitkernel\\compiled.dll");
                     if (newCommand == null)
                     {
                         //tcs.SetResult(true);
@@ -57,6 +64,32 @@ namespace RevitKernel.Core
             }
                 IsRunning = false;
             }
+
+        private Assembly ResolveDlls(object sender, ResolveEventArgs args)
+        {
+
+            try
+            {
+                if (args.Name.Contains("System.Reflection.Metadata") || args.Name.Contains("Microsoft.CodeAnalysis"))
+                {
+                    string filename = Path.GetDirectoryName(typeof(ViewModel).Assembly.Location);
+
+                    filename = Path.Combine(filename,
+                      args.Name.Split(',').FirstOrDefault() + ".dll");
+
+                    if (File.Exists(filename))
+                    {
+                        return System.Reflection.Assembly
+                          .LoadFrom(filename);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
 
         private void Runnable_OnDisplay1(object sender, DisplayEventArgs e)
         {

@@ -8,7 +8,7 @@ namespace IRevitKernel.Core
 {
     public class DisplayEventArgs : EventArgs
     {
-        private readonly Object _displayObject;
+        private readonly object _displayObject;
 
         public DisplayEventArgs(Object displayObject)
         {
