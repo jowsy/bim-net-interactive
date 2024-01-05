@@ -1,0 +1,51 @@
+﻿<Page x:Class="RevitKernel.UI.KernelViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RevitKernel.UI"
+             mc:Ignorable="d" 
+             Background="white"
+             d:DesignHeight="450" d:DesignWidth="800">
+   
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button VerticalAlignment="Center" Padding="1" Margin="2" Command="{Binding StartCommand}">Start</Button>
+            <Button VerticalAlignment="Center" Padding="1"  Margin="2" Command="{Binding RestartCommand}">Restart</Button>
+            <!--  <fa:ImageAwesome  Icon="Connectdevelop" VerticalAlignment="Center" Width="20" Spin="True" SpinDuration="4" Margin="5"/>-->
+            <TextBlock Text="Kernel is running" VerticalAlignment="Center"/>
+            
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" VerticalAlignment="Center" FontWeight="Bold">Events</TextBlock>
+            <DataGrid Grid.Row="1" Margin="0,5,0,0" RowHeaderWidth="16" 
+            Padding="5"
+            CanUserAddRows="False"
+            ItemsSource="{Binding Path=KernelCommands}"/>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" VerticalAlignment="Center" FontWeight="Bold">Variables</TextBlock>
+            <DataGrid Grid.Row="1" Margin="0,5,0,0" RowHeaderWidth="16" 
+    Padding="5"
+    CanUserAddRows="False"
+    ItemsSource="{Binding Path=Variables}"/>
+        </Grid>
+    </Grid>
+    
+</Page>

@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 using RevitKernel.Core;
+using RevitKernel.UI;
 using RevitKernelUI;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace RevitKernel
     {
         public static ExternalEvent ExternalEvent;
 
-
+        public static DockablePaneId DockablePaneId = new DockablePaneId(new Guid("3776E883-839D-4D43-8498-8C7D2345C1CB"));
         internal static RevitKernelExternalEventHandler KernelEventHandler;
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -27,15 +28,23 @@ namespace RevitKernel
         {
             var ribbonPanel = application.CreateRibbonPanel("NET Interactive");
 
-            var command = typeof(EntryCommand);
-            var buttonData = new PushButtonData(command.FullName, "Start Kernel", Assembly.GetAssembly(command).Location, command.FullName);
-         
-            ribbonPanel.AddItem(buttonData);
+            /*var entryCommand = typeof(EntryCommand);
+            var entryButtonData = new PushButtonData(entryCommand.FullName, "Start Kernel\n (Modeless)", Assembly.GetAssembly(entryCommand).Location, entryCommand.FullName); 
+            ribbonPanel.AddItem(entryButtonData);*/
+
+            var showCommand = typeof(ShowCommand);
+            var showButtonData = new PushButtonData(showCommand.FullName, "Show\nDockable Pane)", Assembly.GetAssembly(showCommand).Location, showCommand.FullName);
+            ribbonPanel.AddItem(showButtonData);
 
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(ResolveDlls);
 
             KernelEventHandler = new RevitKernelExternalEventHandler();
             ExternalEvent = ExternalEvent.Create(KernelEventHandler);
+
+
+            var kernelPaneProvider = new KernelDockablePaneProvider(new ViewModel());
+            application.RegisterDockablePane(App.DockablePaneId, "NETInteractive Revit Kernel", kernelPaneProvider);
+
 
             return Result.Succeeded;
         }

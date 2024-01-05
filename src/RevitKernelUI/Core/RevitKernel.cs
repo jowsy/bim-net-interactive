@@ -29,13 +29,10 @@ namespace RevitKernelUI
                                IKernelCommandHandler<RequestValueInfos>
     {
         private readonly Variables _variablesStore;
-        private readonly UIApplication _uiApp;
-        private readonly Autodesk.Revit.DB.Document _doc;
-
         //private ScriptOptions _scriptOptions;
 
 
-        public RevitKernel(string name, Variables variablesStore, Autodesk.Revit.UI.UIApplication uiApp) : base(name)
+        public RevitKernel(string name, Variables variablesStore) : base(name)
         {
          
 
@@ -43,7 +40,7 @@ namespace RevitKernelUI
             KernelInfo.LanguageVersion = "12.0";
             KernelInfo.DisplayName = $"RevitKernel - C# Script";
             this._variablesStore = variablesStore ?? throw new ArgumentNullException(nameof(variablesStore));
-            this._uiApp = uiApp;
+       
         }
 
         public async Task HandleAsync(SubmitCode command, KernelInvocationContext context)

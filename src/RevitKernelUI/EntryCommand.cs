@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Interop;
 
 namespace RevitKernelUI
 {
@@ -18,8 +19,17 @@ namespace RevitKernelUI
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
 
-            var window = new MainWindow(commandData.Application.MainWindowHandle, uiapp);
-            window.Show();    
+           /* var vm = new ViewModel();
+            var window = new MainWindow(vm);
+
+            var interop = new WindowInteropHelper(window);
+            interop.EnsureHandle();
+            interop.Owner = uiapp.MainWindowHandle;
+
+                vm.InitKernel();
+            
+
+            window.Show();    */
             return Result.Succeeded;
         }
     }

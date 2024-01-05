@@ -2,6 +2,7 @@
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.Connection;
 using Microsoft.DotNet.Interactive.Events;
+using RevitKernel.UI;
 using RevitKernelUI.UI;
 using System;
 using System.Collections.Generic;
@@ -18,16 +19,19 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace RevitKernelUI
 {
     public class ViewModel : ViewModelBase, IDisposable
     {
+        public RelayCommand StartCommand { get; }
+        public RelayCommand RestartCommand { get; }
         private const string NamedPipeName = "revit-kernel-2014-pipe";
         private ObservableCollection<CommandViewItem> _kernelCommands = new ObservableCollection<CommandViewItem>();
         private Variables _variablesStore;
-        private readonly CompositeKernel _kernel;
+        private CompositeKernel _kernel;
 
         public ObservableCollection<CommandViewItem> KernelCommands
         {
@@ -49,22 +53,41 @@ namespace RevitKernelUI
         }
 
 
-        public ViewModel(Autodesk.Revit.UI.UIApplication uiApp) {
+        public ViewModel() {
 
             _variablesStore = new Variables();
             _variablesStore.VariablesChanged += _variablesStore_VariablesChanged;
 
+            StartCommand = new RelayCommand((c) =>
+            {
+                InitKernel();
+            });
+
+
+            RestartCommand = new RelayCommand((c) =>
+            {
+                DisposeKernel();
+            });
+
+
+        }
+        public void DisposeKernel()
+        {
+            _kernel.Dispose();
+
+        }
+
+        public void InitKernel()
+        {
             _kernel = new CompositeKernel();
-            
-          
 
             //Perkele! 
             _kernel.KernelEvents.ObserveOn(SynchronizationContext.Current).Subscribe(new KernelObserver(this), new System.Threading.CancellationToken());
-            var revitKernel = new RevitKernel("RevitKernel", _variablesStore, uiApp);
-          
+            var revitKernel = new RevitKernel("RevitKernel", _variablesStore);
+
             _kernel.Add(revitKernel);
             revitKernel.UseValueSharing();
-            
+
 
             revitKernel.AddMiddleware(async (KernelCommand command, KernelInvocationContext context, KernelPipelineContinuation next) =>
             {
@@ -75,12 +98,12 @@ namespace RevitKernelUI
                 else
                 {*/
 
-              /*  await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
-                        KernelCommands.Add(new KernelCommandViewItem()
-                        {
-                            Name = command.GetType().Name
+                /*  await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                          KernelCommands.Add(new KernelCommandViewItem()
+                          {
+                              Name = command.GetType().Name
 
-                        }));*/
+                          }));*/
 
                 await next(command, context);
                 //}
@@ -96,7 +119,10 @@ namespace RevitKernelUI
                                                                                                 Value = v.Value?.ToString()
                                                                                   }));
         }
-
+        public bool KernelIsRunning()
+        {
+            return _kernel != null;
+        }
         private void SetUpNamedPipeKernelConnection()
         {
             var serverStream = new NamedPipeServerStream(
