@@ -56,6 +56,7 @@ namespace RevitKernelUI
 
             _kernel = new CompositeKernel();
             
+          
 
             //Perkele! 
             _kernel.KernelEvents.ObserveOn(SynchronizationContext.Current).Subscribe(new KernelObserver(this), new System.Threading.CancellationToken());

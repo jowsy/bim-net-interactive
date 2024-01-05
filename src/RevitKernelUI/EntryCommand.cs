@@ -18,8 +18,8 @@ namespace RevitKernelUI
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
 
-            var window = new MainWindow(uiapp);
-            window.ShowDialog();    
+            var window = new MainWindow(commandData.Application.MainWindowHandle, uiapp);
+            window.Show();    
             return Result.Succeeded;
         }
     }

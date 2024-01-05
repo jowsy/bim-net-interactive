@@ -46,31 +46,27 @@ namespace RevitKernelUI
             this._uiApp = uiApp;
         }
 
-        public Task HandleAsync(SubmitCode command, KernelInvocationContext context)
+        public async Task HandleAsync(SubmitCode command, KernelInvocationContext context)
         {
 
+            //var codeSubmissionReceived = new CodeSubmissionReceived(command);
+
+            //context.Publish(codeSubmissionReceived);
+
             //string Str = Conversions.ToString(Action.ActionData); // We know it is a string
+            App.KernelEventHandler.tcs = new TaskCompletionSource<bool> ();
+            App.KernelEventHandler.KernelContext = context;
+            App.KernelEventHandler.SubmitCode = (string)command.Code;
             App.ExternalEvent.Raise();
-            try
-            {
-                var service = new CodeDomService();
-                var newCommand = service.CreateCommand(context, (string)command.Code);
-                var type = newCommand.GetType("CodeNamespace.Command");
-                var runnable = Activator.CreateInstance(type) as ICodeCommand;
-                if (runnable == null) throw new Exception("broke");
-                runnable.Execute(_uiApp);
-                context.DisplayStandardOut("Code were successfully compiled and executed in the Revit thread.");
-            }
-            catch (Exception ex)
-            {
+            await App.KernelEventHandler.tcs.Task;
 
-                context.DisplayStandardError("Compilation failed: \n" + ex.ToString());
-            }
-
-        
-       
+            context.DisplayStandardOut("Revit code was exeuted");
+          
+      
             context.Complete(command);
-            return Task.CompletedTask;
+
+            
+            
         }
 
         Task IKernelCommandHandler<RequestValue>.HandleAsync(RequestValue command, KernelInvocationContext context)

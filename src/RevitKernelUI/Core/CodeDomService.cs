@@ -15,10 +15,10 @@ namespace IRevitKernel.Core
 {
     public class CodeDomService
         {
-    
-            public Assembly CreateCommand(KernelInvocationContext context, string commandCode)
+        public Assembly CreateCommand(KernelInvocationContext context, string commandCode)
             {
                 string source = @"
+            using System;
             using Autodesk.Revit.Attributes;
             using Autodesk.Revit.DB;
             using Autodesk.Revit.UI;
@@ -31,11 +31,19 @@ namespace IRevitKernel.Core
             {
               public class Command : ICodeCommand
               {     
+
+                public event EventHandler<DisplayEventArgs> OnDisplay;
+                
                 public bool Execute(UIApplication uiapp)
                 {
                     UIDocument uidoc = uiapp.ActiveUIDocument;"
 + commandCode + @"
                  return true;
+                }
+
+                public void display(Object o)
+                {
+                    OnDisplay?.Invoke(this, new DisplayEventArgs(o));
                 }
               }
             }";
@@ -44,9 +52,9 @@ namespace IRevitKernel.Core
                 return GenerateCode(context, targetUnit);
                 
             }
-  
+          
 
-            public Assembly GenerateCode(KernelInvocationContext context, params CodeCompileUnit[] compilationUnits)
+        public Assembly GenerateCode(KernelInvocationContext context, params CodeCompileUnit[] compilationUnits)
             {
                 CodeDomProvider provider = new CSharpCodeProvider();
                 CompilerParameters compilerParametes = new CompilerParameters();
@@ -79,10 +87,14 @@ namespace IRevitKernel.Core
             if (results.Errors != null && results.Errors.Count > 0){
                 foreach (var item in results.Errors)
                 {
-                    context.DisplayStandardError(item.ToString());
+                    context.DisplayStandardError(item.ToString()+"\n");
                 }
             }
 
+            if (results.Errors.Count > 0)
+            {
+                return null;
+            }
                 return results.CompiledAssembly;
             }
         }

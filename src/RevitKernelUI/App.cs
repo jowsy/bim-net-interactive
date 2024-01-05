@@ -14,6 +14,9 @@ namespace RevitKernel
     public class App : IExternalApplication
     {
         public static ExternalEvent ExternalEvent;
+
+
+        internal static RevitKernelExternalEventHandler KernelEventHandler;
         public Result OnShutdown(UIControlledApplication application)
         {
             return Result.Cancelled;
@@ -31,8 +34,8 @@ namespace RevitKernel
 
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(ResolveDlls);
 
-            var eventHandler = new RevitKernelExternalEventHandler();
-            ExternalEvent = ExternalEvent.Create(eventHandler);
+            KernelEventHandler = new RevitKernelExternalEventHandler();
+            ExternalEvent = ExternalEvent.Create(KernelEventHandler);
 
             return Result.Succeeded;
         }

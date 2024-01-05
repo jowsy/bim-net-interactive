@@ -6,9 +6,24 @@ using Autodesk.Revit.UI;
 
 namespace IRevitKernel.Core
 {
+    public class DisplayEventArgs : EventArgs
+    {
+        private readonly Object _displayObject;
+
+        public DisplayEventArgs(Object displayObject)
+        {
+            _displayObject = displayObject;
+        }
+
+        public object DisplayObject
+        {
+            get { return _displayObject; }
+        }
+    }
     public interface ICodeCommand
         {
-            public bool Execute(UIApplication uiapp);
+        public event EventHandler<DisplayEventArgs> OnDisplay;
+        public bool Execute(UIApplication uiapp);
         }
 }
 
