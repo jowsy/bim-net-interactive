@@ -26,7 +26,14 @@ namespace RevitKernel
 
         public Result OnStartup(UIControlledApplication application)
         {
+            AppDomain.CurrentDomain.AssemblyResolve
+     += CurrentDomain_AssemblyResolve;
+
+            //Assembly.LoadFrom("C:\\git\\bim-net-interactive\\src\\RevitKernelUI\\bin\\Debug R24\\Microsoft.DotNet.Interactive.Formatting.dll");
+            var str = Microsoft.DotNet.Interactive.Formatting.JsonFormatter.MimeType;
+
             var ribbonPanel = application.CreateRibbonPanel("NET Interactive");
+            //var str2 = new Microsoft.DotNet.Interactive.Formatting.PocketView();
 
             /*var entryCommand = typeof(EntryCommand);
             var entryButtonData = new PushButtonData(entryCommand.FullName, "Start Kernel\n (Modeless)", Assembly.GetAssembly(entryCommand).Location, entryCommand.FullName); 
@@ -36,8 +43,7 @@ namespace RevitKernel
             var showButtonData = new PushButtonData(showCommand.FullName, "Show\nDockable Pane)", Assembly.GetAssembly(showCommand).Location, showCommand.FullName);
             ribbonPanel.AddItem(showButtonData);
 
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(ResolveDlls);
-
+        
             KernelEventHandler = new RevitKernelExternalEventHandler();
             ExternalEvent = ExternalEvent.Create(KernelEventHandler);
 
@@ -45,15 +51,20 @@ namespace RevitKernel
             var kernelPaneProvider = new KernelDockablePaneProvider(new ViewModel());
             application.RegisterDockablePane(App.DockablePaneId, "NETInteractive Revit Kernel", kernelPaneProvider);
 
-
+          
             return Result.Succeeded;
         }
 
-        private static Assembly ResolveDlls(object sender, ResolveEventArgs args)
+
+
+        System.Reflection.Assembly
+    CurrentDomain_AssemblyResolve(
+      object sender,
+      ResolveEventArgs args)
         {
             try
             {
-                if (args.Name.ToLower().Contains("system.diagnostics.diagnosticsource") || args.Name.Contains("System.Reflection.Metadata") || args.Name.Contains("Microsoft.CodeAnalysis"))
+                if  (args.Name.Contains("Encodings") || args.Name.Contains("Retro"))
                 {
                     string filename = Path.GetDirectoryName(typeof(ViewModel).Assembly.Location);
 

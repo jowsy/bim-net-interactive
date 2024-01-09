@@ -23,7 +23,7 @@ namespace IRevitKernel.Core
     public interface ICodeCommand
         {
         public event EventHandler<DisplayEventArgs> OnDisplay;
-        public bool Execute(UIApplication uiapp);
+        public (string, object) Execute(UIApplication uiapp);
         }
 }
 

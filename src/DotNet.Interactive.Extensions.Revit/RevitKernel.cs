@@ -35,7 +35,8 @@ namespace Jo.Interactive.Extensions.Revit
             KernelInfo.DisplayName = $"RevitKernel - C# Script";
           
            /* _scriptOptions = ScriptOptions.Default
-      .WithLanguageVersion(LanguageVersion.Latest)
+      .WithLanguageVersion(LanguageVersion.La
+           )
       .AddImports(
           "System",
           "System.Text",

@@ -7,7 +7,22 @@
              mc:Ignorable="d" 
              Background="white"
              d:DesignHeight="450" d:DesignWidth="800">
-   
+    <Page.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <!--Colors are shared by different controls-->
+                <!--http://stackoverflow.com/questions/17057934/wpf-merged-resource-dictionary-no-being-recognized-from-app-xaml-->
+                <!--<ResourceDictionary Source="/RetroUI;component/Themes/Colors.Retro.xaml"/>-->
+
+                <ResourceDictionary Source="/RetroUI;component/Themes/Generic.xaml"/>
+
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </Page.Resources>
+
     <Grid>
 
         <Grid.RowDefinitions>

@@ -45,21 +45,22 @@ namespace RevitKernelUI
 
         public async Task HandleAsync(SubmitCode command, KernelInvocationContext context)
         {
-
-            //var codeSubmissionReceived = new CodeSubmissionReceived(command);
-
-            //context.Publish(codeSubmissionReceived);
-
-            //string Str = Conversions.ToString(Action.ActionData); // We know it is a string
-            App.KernelEventHandler.tcs = new TaskCompletionSource<bool> ();
+            App.KernelEventHandler.tcs = new TaskCompletionSource<(string,object)> ();
             App.KernelEventHandler.KernelContext = context;
-            App.KernelEventHandler.SubmitCode = (string)command.Code;
-            App.ExternalEvent.Raise();
-            await App.KernelEventHandler.tcs.Task;
 
-            context.DisplayStandardOut("Revit code was exeuted");
-          
-      
+            _variablesStore.TryGetValue("assemblyPath", out object dllPath);
+            if (dllPath != null)
+            {
+                App.KernelEventHandler.CompiledDllPath = (string)dllPath;
+                App.ExternalEvent.Raise();
+                var result = await App.KernelEventHandler.tcs.Task;
+                if (result != (null, null))
+                {
+                    _variablesStore.Add(result.Item1, result.Item2);
+                }
+            }
+           // context.DisplayStandardOut("Revit code was executed");
+             
             context.Complete(command);
 
             
@@ -68,7 +69,6 @@ namespace RevitKernelUI
 
         Task IKernelCommandHandler<RequestValue>.HandleAsync(RequestValue command, KernelInvocationContext context)
         {
-            
             if (_variablesStore.TryGetValue(command.Name, out var value))
             {
                 context.PublishValueProduced(command, value);

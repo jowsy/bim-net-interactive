@@ -1,6 +1,8 @@
 ﻿using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.Connection;
+using Microsoft.DotNet.Interactive.Events;
+using RevitKernel.Core;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -36,15 +38,30 @@ namespace DotNet.Interactive.Extensions.Revit
             var localName = commandLineContext.ParseResult.GetValueForOption(KernelNameOption);
 
             var proxyKernel = await connector.CreateKernelAsync(localName!);
+
+            
             proxyKernel.AddMiddleware(async (KernelCommand command, KernelInvocationContext context, KernelPipelineContinuation next) =>
             {
-                if (command is SubmitCode)
+                var submitCommand = command as SubmitCode;
+                if (submitCommand != null)
                 {
-                    context.DisplayStandardOut("compile it here! Yikes!!");
+                    RoslynCompilerService roslynCompilerService = new RoslynCompilerService();
+                    var assemblyPath = roslynCompilerService.CompileCode(context, submitCommand.Code);
+                    await proxyKernel.SendAsync(new SendValue("assemblyPath", assemblyPath));
+                    if (assemblyPath == null)
+                    {
+                        context.Fail(command);
+                    }
+                   
+                    await next(command, context);
+                }
+                else
+                {
+                    await next(command, context);
                 }
             
 
-                await next(command, context);
+              
                 
             });
             proxyKernel.UseValueSharing();

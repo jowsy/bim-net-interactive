@@ -17,18 +17,16 @@ namespace RevitKernel.Core
     {
         internal bool IsRunning { get; set; }
 
-        internal TaskCompletionSource<bool> tcs = null;
+        internal TaskCompletionSource<(string,object)> tcs = null;
 
         public KernelInvocationContext KernelContext { get; set; }
-        public string SubmitCode { get; set; }
+        public string CompiledDllPath { get; set; }
         public void Execute(UIApplication uiapp)
             {
+            (string, object) result = (null, null);
             try
             {
-
                 //AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(ResolveDlls);
-
-
                 IsRunning = true;
                 UIDocument uidoc = uiapp.ActiveUIDocument;
                 if (null == uidoc)
@@ -37,30 +35,26 @@ namespace RevitKernel.Core
                 }
                 try
     {
-                    //var service = new RoslynCompilerService();
-                    //var newCommand = service.CreateCommand(KernelContext, (string)SubmitCode);
-                    var newCommand = Assembly.LoadFrom("C:\\Users\\sejsau\\AppData\\Local\\revitkernel\\compiled.dll");
+                    var newCommand = Assembly.LoadFile(CompiledDllPath);
                     if (newCommand == null)
                     {
-                        //tcs.SetResult(true);
                         return;
                     }
                     var type = newCommand.GetType("CodeNamespace.Command");
                     var runnable = Activator.CreateInstance(type) as ICodeCommand;
                     if (runnable == null) throw new Exception("");
                     runnable.OnDisplay += Runnable_OnDisplay1;
-                    runnable.Execute(uiapp);
+                    result = runnable.Execute(uiapp);
                     //context.DisplayStandardOut("Code were successfully compiled and executed in the Revit thread.");
                 }
                 catch (Exception ex)
                 {
-
                     KernelContext.DisplayStandardError("Compilation failed: \n" + ex.ToString());
-                    }
+                }
             }
             finally
             {
-                tcs.SetResult(true);
+                tcs.SetResult(result);
             }
                 IsRunning = false;
             }
