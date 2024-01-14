@@ -1,0 +1,73 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+#r "nuget:DotNet.Interactive.Extensions.Revit"
+
+#i "C:\git\bim-net-interactive\src\DotNet.Interactive.Extensions.Revit\bin\Debug\"
+//using DotNet.Interactive.Extensions.Revit;
+
+#!csharp
+
+#!connect revit --kernel-name revit24 --revit-version 2024
+
+#!csharp
+
+#!revit24
+
+ Document doc = uidoc.Document;
+// Prepare a filter to collect all ViewSheet elements
+    FilteredElementCollector collector = new FilteredElementCollector(doc);
+    var list = collector.OfClass(typeof(ViewSheet)).Select(vs => new { viewId = vs.Id.ToString(),
+                                                            name = vs.Name}).ToList();;
+
+
+list
+
+#!csharp
+
+#!revit24
+Selection selection = uidoc.Selection;
+Document doc = uidoc.Document;
+ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
+var id = selectedIds.FirstOrDefault();
+var wall = doc.GetElement(id) as Wall;
+var geom = wall.get_Geometry(new Options());
+geom
+
+#!csharp
+
+#!set --value @revit24:list --name list
+
+list.Display("html")
+
+#!csharp
+
+#r "nuget:Revit.RevitApi.x64, 2023.0.0"
+#r "nuget:Revit.RevitApiUi.x64, 2023.0.0"
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+
+#!csharp
+
+#!revit24
+
+   Document doc = uidoc.Document;
+    // Set up the DWG export options
+    DWGExportOptions dwgOptions = new DWGExportOptions();
+    dwgOptions.ExportOfSolids = SolidGeometry.ACIS;
+    dwgOptions.TargetUnit = ExportUnit.Millimeter; // or another unit if needed
+    dwgOptions.SharedCoords = false; // set to true if you want to use shared coordinates
+    dwgOptions.FileVersion = ACADVersion.R2018; // set the DWG version
+    // Create a set to contain the view id(s) to be exported
+    ICollection<ElementId> viewIds = new List<ElementId>();
+    viewIds.Add(new ElementId(359502));
+
+    // Perform the export
+    doc.Export("c:\\temp\\", "export2.dwg", viewIds, dwgOptions);
+
+#!pwsh
+
+Start-Process "C:\Program Files\Autodesk\AutoCAD 2023\acad.exe" -ArgumentList "C:\temp\export2.dwg" 
