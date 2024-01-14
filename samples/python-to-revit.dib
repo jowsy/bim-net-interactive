@@ -1,0 +1,50 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"},{"aliases":[],"languageName":"python","name":"pythonkernel"}]}}
+
+#!csharp
+
+#!connect jupyter --kernel-name pythonkernel --kernel-spec python3
+
+#!pythonkernel
+
+pip install geopandas
+
+#!pythonkernel
+
+pip install shapely
+
+#!pythonkernel
+
+import geopandas
+import json
+import shapely
+# Import necessary geometric objects from shapely module
+from shapely.geometry import Point, LineString, Polygon
+
+# Create Point geometric object(s) with coordinates
+line = LineString([[0, 0], [1, 0], [1, 1]])
+
+line
+
+#!csharp
+
+#!set --value @pythonkernel:line --name line
+
+line.Display();
+
+#!csharp
+
+#r "nuget:Hypar.Elements, *-*"
+
+#!csharp
+
+using Elements.GeoJSON;
+
+LineString lineString = new LineString(new Position[] {new Position(40,34), new Position(33, 55), new Position(35, 55)});
+
+lineString
+
+#!csharp
+
+using System.Text.Json;

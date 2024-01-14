@@ -1,0 +1,29 @@
+﻿
+/*
+ * Give credit to https://github.com/ricaun/RevitAddin.CodeCompileTest/blob/master/RevitAddin.CodeCompileTest/Services/CodeDomService.cs
+ * */
+using Autodesk.Revit.UI;
+
+namespace Jowsy.Revit.KernelAddin.Core
+{
+    public class DisplayEventArgs : EventArgs
+    {
+        private readonly object _displayObject;
+
+        public DisplayEventArgs(object displayObject)
+        {
+            _displayObject = displayObject;
+        }
+
+        public object DisplayObject
+        {
+            get { return _displayObject; }
+        }
+    }
+    public interface ICodeCommand
+    {
+        public event EventHandler<DisplayEventArgs> OnDisplay;
+        public (string, object) Execute(UIApplication uiapp);
+    }
+}
+
