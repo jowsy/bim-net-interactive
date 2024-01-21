@@ -1,4 +1,5 @@
-﻿using Microsoft.DotNet.Interactive;
+﻿using Jowsy.CSharp;
+using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.Connection;
 using Microsoft.DotNet.Interactive.Events;
@@ -44,28 +45,42 @@ namespace Jowsy.DotNet.Interactive.Extensions
                 var submitCommand = command as SubmitCode;
                 if (submitCommand != null)
                 {
-                    RoslynCompilerService roslynCompilerService = new RoslynCompilerService();
+                    RoslynCompilerService compilerService = new RoslynCompilerService();
 
-                    context.DisplayStandardOut($"Requesting value infos...");
-                    var result = await proxyKernel.SendAsync(new RequestValueInfos());
+                    
 
-                    var valueInfosProduced = result.Events.Where(e => e is ValueInfosProduced)
-                                                   .FirstOrDefault() as ValueInfosProduced;
+                    var results = await compilerService.CompileRevitAddin(submitCommand.Code, 
+                                                                        true, 
+                                                                        async () =>
+                                                                        {
+                                                                        context.DisplayStandardOut($"Requesting value infos...");
+                                                                        var result = await proxyKernel.SendAsync(new RequestValueInfos());
 
-                    if (valueInfosProduced != null) {
-                        context.DisplayStandardOut($"Value info received...");
-                        foreach (var item in valueInfosProduced.ValueInfos)
-                        {
-                            context.DisplayStandardOut($"Name: {item.Name}, TypeName: {item.TypeName}: Value:{item.FormattedValue.Value}\n");
-                        }
-                    }
+                                                                        var valueInfosProduced = result.Events.Where(e => e is ValueInfosProduced)
+                                                                                                        .FirstOrDefault() as ValueInfosProduced;
 
-                    var assemblyPath = roslynCompilerService.CompileCode(context, submitCommand.Code);
-                    await proxyKernel.SendAsync(new SendValue("assemblyPath", assemblyPath));
-                    if (assemblyPath == null)
+                                                                        if (valueInfosProduced != null)
+                                                                        {
+                                                                            context.DisplayStandardOut($"Value info received...");
+                                                                            foreach (var item in valueInfosProduced.ValueInfos)
+                                                                            {
+                                                                                context.DisplayStandardOut($"Name: {item.Name}, TypeName: {item.TypeName}: Value:{item.FormattedValue.Value}\n");
+                                                                            }
+                                                                        }
+                                                                        if (valueInfosProduced == null)
+                                                                        {
+                                                                            return null;
+                                                                        }
+                                                                        return valueInfosProduced.ValueInfos.ToArray();
+                  
+                                                                        });
+
+                    if (results.AssemblyPath == null)
                     {
+                        context.DisplayStandardError(results.DiagnosticText);
                         context.Fail(command);
                     }
+                    await proxyKernel.SendAsync(new SendValue("assemblyPath", results.AssemblyPath, FormattedValue.CreateSingleFromObject(results.AssemblyPath)));
 
                     await next(command, context);
                 }

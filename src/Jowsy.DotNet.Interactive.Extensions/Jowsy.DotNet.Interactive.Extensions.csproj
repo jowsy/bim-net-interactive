@@ -4,7 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <Version>1.68.0</Version>
+	<Version>1.77.0</Version>
+	<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
 	<PropertyGroup>
@@ -24,4 +25,16 @@
 		<PackageReference Include="microsoft.dotnet.interactive.csharp" Version="1.0.0-beta.23611.1" />
 		<PackageReference Include="microsoft.dotnet.interactive.formatting" Version="1.0.0-beta.23611.1" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Jowsy.CSharp\Jowsy.CSharp.csproj">
+			<ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+			<IncludeAssets>Jowsy.CSharp.dll</IncludeAssets>
+		</ProjectReference>
+	</ItemGroup>
+	<Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
+		<ItemGroup>
+			<BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
+		</ItemGroup>
+	</Target>
 </Project>

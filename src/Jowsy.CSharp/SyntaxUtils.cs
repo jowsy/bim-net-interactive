@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.DotNet.Interactive.ValueSharing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,26 +13,24 @@ namespace Jowsy.CSharp
 {
     public class SyntaxUtils
     {
-        public static CompilationUnitSyntax GenerateCodeCommand(string script)
-        {
-            string source = @"using System;
+        public static string BuildClassCode(string script) =>
+@"using System;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
-using BIMKernels.Addins.Revit.Core;
+using Jowsy.Revit.KernelAddin.Core;
 
-namespace CodeNamespace
+namespace Jowsy.Revit.KernelAddin.Core
 {
     public class Command : ICodeCommand
     {
         public event EventHandler<DisplayEventArgs> OnDisplay;
 
-        public (string, object) Execute(UIApplication uiapp)
-        {
-            UIDocument uidoc = uiapp.ActiveUIDocument;"
+        public (string, object) Execute(UIApplication uiapp, Variables __variables)
+        {"
 + script + @"
         }
 
@@ -40,37 +40,14 @@ namespace CodeNamespace
         }
     }
 }";
+        
+        public static CompilationUnitSyntax GenerateCodeCommand(string script)
+        {
 
-            /* string source = @"using System;
-             using Autodesk.Revit.Attributes;
-             using Autodesk.Revit.DB;
-             using Autodesk.Revit.UI;
-             using System.Collections;
-             using System.Linq;
-             using System.Collections.Generic;
-             using BIMKernels.Addins.Revit.Core;
-
-             namespace CodeNamespace 
-             {
-               public class Command : ICodeCommand
-               {
-                 public event EventHandler<DisplayEventArgs> OnDisplay;
-
-                 public (string, object) Execute(UIApplication uiapp)
-                 {
-                     UIDocument uidoc = uiapp.ActiveUIDocument;"
- + script + @"
-                 }
-
-                 public void display(object o)
-                 {
-                     OnDisplay?.Invoke(this, new DisplayEventArgs(o));
-                 }
-               }
-             }";*/
+            var source = BuildClassCode(script);
 
             var tree = CSharpSyntaxTree.ParseText(source);
-
+            
             var root = (CompilationUnitSyntax)tree.GetRoot().NormalizeWhitespace();
 
             return root;
@@ -128,6 +105,64 @@ namespace CodeNamespace
 
             return newTree;
 
+        }
+
+        public static SyntaxNode? ResolveUndeclaredVariables(Compilation? compilation, IEnumerable<KernelValueInfo>? valueInfos)
+        {
+            var diagnostics = compilation.GetDiagnostics().Where(d => d.Id == "CS0103");
+
+            List<string> missingVariableDeclarations = new List<string>();
+            foreach (var item in diagnostics)
+            {
+                var sourceSpan = item.Location?.SourceSpan;
+                if (sourceSpan == null)
+                {
+                    continue;
+                }
+
+                var variable = item.Location?
+                                   .SourceTree?
+                                   .ToString()
+                                   .Substring(sourceSpan.Value.Start, sourceSpan.Value.Length);
+                if (variable != null)
+                {
+                    missingVariableDeclarations.Add(variable);
+                }
+            }
+
+            var tree = compilation.SyntaxTrees.FirstOrDefault();
+
+            //var semanticModel = compilation.GetSemanticModel(tree);
+
+            MethodDeclarationSyntax methodDecl = tree.GetRoot()
+                                               .DescendantNodes()
+                                               .OfType<ClassDeclarationSyntax>()
+                                               .First().ChildNodes()
+                                               .OfType<MethodDeclarationSyntax>()
+                                               .First();
+
+            var block = methodDecl.DescendantNodes()
+                                  .OfType<BlockSyntax>()
+                                  .FirstOrDefault();
+
+            SyntaxNode node = block.ChildNodes().First();
+
+            List<SyntaxNode> nodesToAppend = new List<SyntaxNode>();
+            foreach (var variable in missingVariableDeclarations.Distinct())
+            {
+                var valueInfo = valueInfos.Where(vi => vi.Name == variable).FirstOrDefault();
+
+                if (valueInfo != null)
+                {
+                    var valueInfoNode = SyntaxFactory.ParseStatement($"{valueInfo.TypeName} {valueInfo.Name} = ({valueInfo.TypeName})__variables.GetVariables()[\"{valueInfo.Name}\"];");
+                    nodesToAppend.Add(valueInfoNode);
+                }
+
+            }
+            var result = tree.GetRoot()
+                             .InsertNodesBefore(node, nodesToAppend);
+
+            return result;
         }
     }
 }

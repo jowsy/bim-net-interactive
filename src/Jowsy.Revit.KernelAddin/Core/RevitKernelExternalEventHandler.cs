@@ -16,6 +16,8 @@ namespace Jowsy.Revit.KernelAddin.Core
     {
         internal bool IsRunning { get; set; }
 
+        internal Variables Variables { get; set; }
+
         internal TaskCompletionSource<(string, object)> tcs = null;
 
         public KernelInvocationContext KernelContext { get; set; }
@@ -39,11 +41,11 @@ namespace Jowsy.Revit.KernelAddin.Core
                     {
                         return;
                     }
-                    var type = newCommand.GetType("CodeNamespace.Command");
+                    var type = newCommand.GetType("Jowsy.Revit.KernelAddin.Core.Command");
                     var runnable = Activator.CreateInstance(type) as ICodeCommand;
                     if (runnable == null) throw new Exception("");
                     runnable.OnDisplay += Runnable_OnDisplay1;
-                    result = runnable.Execute(uiapp);
+                    result = runnable.Execute(uiapp, Variables);
                     //context.DisplayStandardOut("Code were successfully compiled and executed in the Revit thread.");
                 }
                 catch (Exception ex)
@@ -86,7 +88,8 @@ namespace Jowsy.Revit.KernelAddin.Core
 
         private void Runnable_OnDisplay1(object sender, DisplayEventArgs e)
         {
-            KernelContext.DisplayStandardOut(e.DisplayObject.ToString());
+            var mimetype = Microsoft.DotNet.Interactive.Formatting.Formatter.GetPreferredMimeTypesFor(e.DisplayObject?.GetType()).First();
+            KernelContext.Display(e.DisplayObject, mimetype);
         }
 
         public string GetName()

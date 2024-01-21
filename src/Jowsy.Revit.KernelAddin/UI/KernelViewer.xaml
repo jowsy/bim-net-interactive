@@ -34,7 +34,7 @@
             <Button VerticalAlignment="Center" Padding="1" Margin="2" Command="{Binding StartCommand}">Start</Button>
             <Button VerticalAlignment="Center" Padding="1"  Margin="2" Command="{Binding RestartCommand}">Restart</Button>
             <!--  <fa:ImageAwesome  Icon="Connectdevelop" VerticalAlignment="Center" Width="20" Spin="True" SpinDuration="4" Margin="5"/>-->
-            <TextBlock Text="Kernel is running" VerticalAlignment="Center"/>
+            <!--<TextBlock Text="Kernel is running" VerticalAlignment="Center"/>-->
             
         </StackPanel>
 

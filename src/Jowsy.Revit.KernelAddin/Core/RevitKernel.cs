@@ -46,12 +46,13 @@ namespace Jowsy.Revit.KernelAddin.Core
         {
             App.KernelEventHandler.tcs = new TaskCompletionSource<(string, object)>();
             App.KernelEventHandler.KernelContext = context;
+            App.KernelEventHandler.Variables = _variablesStore;
 
             _variablesStore.TryGetValue("assemblyPath", out string dllPath);
             if (dllPath != null)
             {
                 App.KernelEventHandler.CompiledDllPath = dllPath;
-                App.ExternalEvent.Raise();
+                App.KernelEvent.Raise();
                 var result = await App.KernelEventHandler.tcs.Task;
                 if (result != (null, null))
                 {

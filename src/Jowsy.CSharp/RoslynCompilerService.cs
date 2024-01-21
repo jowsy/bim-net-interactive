@@ -11,25 +11,22 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.DotNet.Interactive.ValueSharing;
+using Microsoft.DotNet.Interactive.Connection;
+using Microsoft.DotNet.Interactive.Commands;
+using Microsoft.DotNet.Interactive.Events;
 //Influenced by https://github.com/RickStrahl/Westwind.Scripting/blob/master/Westwind.Scripting/CSharpScriptExecution.cs#L1254
 namespace Jowsy.CSharp
 {
-    public class ReferenceList : HashSet<PortableExecutableReference>
-    {
-
-    }
     public class RoslynCompilerService
     {
+        public ReferenceList References { get; private set; }
+        public string GeneratedClassCode { get; private set; }
+
         public RoslynCompilerService()
         {
             References = new ReferenceList();
             AddNetFrameworkDefaultReferences();
-            /*var assemblyNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies().ToList();
-            foreach (var assembly in assemblyNames)
-            {
-                AddAssembly(assembly.Name);
-            }*/
-            //AddNetFrameworkDefaultReferences();
         }
         public void AddNetFrameworkDefaultReferences()
         {
@@ -40,7 +37,7 @@ namespace Jowsy.CSharp
             AddAssembly("Microsoft.CSharp.dll");
             AddAssembly("System.Net.Http.dll");
             //AddAssembly(typeof(object).GetTypeInfo().Assembly.FullName);
-            AddAssembly("C:\\git\\bim-net-interactive\\src\\RevitKernelUI\\bin\\Debug R24\\RevitKernel.dll");
+            AddAssembly("C:\\git\\bim-net-interactive\\src\\Jowsy.Revit.KernelAddin\\bin\\Debug R24\\Jowsy.Revit.KernelAddin.dll");
             AddAssembly("C:\\Program Files\\Autodesk\\Revit 2024\\RevitAPI.dll");
             AddAssembly("C:\\Program Files\\Autodesk\\Revit 2024\\RevitAPIUI.dll");
 
@@ -78,49 +75,25 @@ namespace Jowsy.CSharp
         }
 
 
-        public ReferenceList References { get; private set; }
-        public string GeneratedClassCode { get; private set; }
-
-        public CompilationResults CompileCode(string commandCode)
+        /// <summary>
+        /// Compiles a revit addin dll from a C#-script
+        /// </summary>
+        /// <param name="script">C# code</param>
+        /// <param name="KernelValueInfosResolver">a resolver for list of kernelvalueinfos</param>
+        /// <returns></returns>
+        public async Task<CompilationResults> CompileRevitAddin(string script, bool 
+                                                                toAssemblyFile, 
+                                                                Func<Task<KernelValueInfo[]>>?  KernelValueInfosResolver)
         {
-            string source = @"
-            using System;
-            using Autodesk.Revit.Attributes;
-            using Autodesk.Revit.DB;
-            using Autodesk.Revit.UI;
-            using System.Collections;
-            using System.Linq;
-            using System.Collections.Generic;
-            using IRevitKernel.Core;
-
-            namespace CodeNamespace 
-            {
-              public class Command : ICodeCommand
-              {     
-
-                public event EventHandler<DisplayEventArgs> OnDisplay;
-                
-                public (string, object) Execute(UIApplication uiapp)
-                {
-                    UIDocument uidoc = uiapp.ActiveUIDocument;"
-+ commandCode + @"
-                }
-
-                public void display(object o)
-                {
-                    OnDisplay?.Invoke(this, new DisplayEventArgs(o));
-                }
-              }
-            }";
+            var source = SyntaxUtils.BuildClassCode(script);
 
             var tree = CSharpSyntaxTree.ParseText(source.Trim());
 
             var root = (CompilationUnitSyntax)tree.GetRoot();
-
-            var tRoot = TransformRoot(root);
+            
+            var tRoot = SyntaxUtils.FixReturn(root);
             var finalTree = CSharpSyntaxTree.Create(tRoot);
-            //var tree = SyntaxFactory.ParseSyntaxTree(source.Trim());
-
+           
             var optimizationLevel = OptimizationLevel.Release;
 
             var compilation = CSharpCompilation.Create($"revitkernelgenerated-{DateTime.Today.Ticks}")
@@ -130,28 +103,56 @@ namespace Jowsy.CSharp
                 .AddReferences(References)
                 .AddSyntaxTrees(finalTree);
 
-            //if (SaveGeneratedCode)
+            var diagnostics = compilation.GetDiagnostics().Where(d => d.Id == "CS0103"); //Look for undeclared variables
+
             GeneratedClassCode = finalTree.ToString();
 
-            bool isFileAssembly = false;
+            if (diagnostics.Any()) {
+
+                if (KernelValueInfosResolver == null)
+                {
+                    throw new ArgumentNullException(nameof(KernelValueInfosResolver));  
+                }
+
+                var valueInfos = await KernelValueInfosResolver();
+             
+                    var syntax = SyntaxUtils.ResolveUndeclaredVariables(compilation, valueInfos) as CompilationUnitSyntax;
+
+                    //New try
+                    var newTree = CSharpSyntaxTree.Create(syntax);
+                    compilation = CSharpCompilation.Create($"revitkernelgenerated-{DateTime.Today.Ticks}")
+                        .WithOptions(new CSharpCompilationOptions(
+                                    OutputKind.DynamicallyLinkedLibrary, optimizationLevel: optimizationLevel)
+                        )
+                        .AddReferences(References)
+                        .AddSyntaxTrees(newTree);
+
+                GeneratedClassCode = newTree.ToString();    
+
+            }
+            //if (SaveGeneratedCode)
+           
+
+
             Stream codeStream = null;
-            /* if (string.IsNullOrEmpty(OutputAssembly))
-             {*/
-            //  codeStream = new MemoryStream(); // in-memory assembly
-            //}
-            //else
-            //{
-            string outputAssembly = Path.Combine(Path.GetTempPath(),
-                                            "revitkernel", $"{Path.GetRandomFileName()}.dll");
-            if (!Directory.Exists(Path.GetDirectoryName(outputAssembly)))
+            Assembly assembly = null;
+            string outputAssembly = null;
+
+            if (toAssemblyFile)
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(outputAssembly));
+                outputAssembly = Path.Combine(Path.GetTempPath(),
+                                  "revitkernel", $"{Path.GetRandomFileName()}.dll");
+                if (!Directory.Exists(Path.GetDirectoryName(outputAssembly)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(outputAssembly));
+                }
             }
 
-            codeStream = new FileStream(outputAssembly, FileMode.Create);
-            isFileAssembly = true;
-            //}
+            codeStream = toAssemblyFile ? new FileStream(outputAssembly, FileMode.Create) :
+                                          new MemoryStream();
+           
 
+            
             using (codeStream)
             {
                 EmitResult compilationResult = null;
@@ -164,6 +165,7 @@ namespace Jowsy.CSharp
                 else*/
                 compilationResult = compilation.Emit(codeStream);
 
+     
                 // Compilation Error handling
                 if (!compilationResult.Success)
                 {
@@ -184,21 +186,38 @@ namespace Jowsy.CSharp
                     }
                     //ErrorType = ExecutionErrorTypes.Compilation;
                     //ErrorMessage = sb.ToString();
-
+                    if (!toAssemblyFile)
+                    {
+                        var memStream = (MemoryStream)codeStream;
+                        memStream.Seek(0, SeekOrigin.Begin);
+                        assembly = Assembly.Load(memStream.ToArray());
+                    }
                     // no exception here during compilation - return the error
                     //SetErrors(new ApplicationException(ErrorMessage), true);
                     return new CompilationResults()
                     {
-                        Success = false
+                        Success = false,
+                        DiagnosticText = sb.ToString(),
                     };
                 }
             }
 
-            return new CompilationResults()
+            if (toAssemblyFile)
             {
-                Success = true,
-                AssemblyPath = outputAssembly
+                return new CompilationResults()
+                {
+                    Success = true,
+                    AssemblyPath = outputAssembly
+                };
+            }
+            else
+            {
+                return new CompilationResults()
+                {
+                    Success = true,
+                    Assembly = assembly
             };
+            }
 
 
         }
@@ -222,8 +241,6 @@ namespace Jowsy.CSharp
             #endif*/
             return Assembly.Load(rawAssembly);
         }
-
-
         public bool AddAssembly(Type type)
         {
             try
@@ -240,63 +257,6 @@ namespace Jowsy.CSharp
             }
 
             return true;
-        }
-
-        private static CompilationUnitSyntax TransformRoot(CompilationUnitSyntax root)
-        {
-
-            MethodDeclarationSyntax methodDecl = root
-    .DescendantNodes()
-    .OfType<ClassDeclarationSyntax>()
-    .First().ChildNodes().OfType<MethodDeclarationSyntax>().First();
-
-            var block = methodDecl.DescendantNodes().OfType<BlockSyntax>().FirstOrDefault();
-
-            //look for return statement in the method block
-            var returnStatement = block.DescendantNodes()
-                                       .OfType<ReturnStatementSyntax>().FirstOrDefault();
-
-            if (returnStatement != null)
-            {
-                var returnStatementSyntax = returnStatement as ReturnStatementSyntax;
-                var varName = (returnStatementSyntax.Expression as IdentifierNameSyntax)?.Identifier.Text;
-
-                var newNode = SyntaxFactory.ParseStatement($"return (\"{varName}\", {varName});");
-                var newTree2 = root.ReplaceNode(returnStatement, newNode);
-                return newTree2;
-            }
-
-            var nodes = block.ChildNodes();
-            var lastNode = nodes.Last();
-
-
-            var testCSharpScriptReturnStatement = lastNode as ExpressionStatementSyntax;
-            if (testCSharpScriptReturnStatement != null)
-            {
-                if (string.IsNullOrEmpty(testCSharpScriptReturnStatement.SemicolonToken.Text))
-                {
-                    var returnVariableName = (testCSharpScriptReturnStatement.Expression as IdentifierNameSyntax)?.Identifier.Text;
-                    if (returnVariableName != null)
-                    {
-
-                        var newNode = SyntaxFactory.ParseStatement($"return (\"{returnVariableName}\",{returnVariableName});");
-                        var newTree2 = root.ReplaceNode(testCSharpScriptReturnStatement, newNode);
-
-                        return newTree2;
-
-                    }
-
-                }
-            }
-
-            //When we just want to execute statements we return null
-            var newReturnStatement = SyntaxFactory.ParseStatement("return (null,null);");
-
-            var newTree = root.InsertNodesAfter(lastNode, new List<SyntaxNode>() { newReturnStatement });
-
-            return newTree;
-
-
         }
     }
 }

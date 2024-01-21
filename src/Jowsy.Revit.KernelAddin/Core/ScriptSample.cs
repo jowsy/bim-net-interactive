@@ -45,5 +45,10 @@ namespace Jowsy.Revit.KernelAddin.Core
             //  transaction
 
         }
+
+        public (string, object) Execute(UIApplication uiapp, Variables variables)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,9 +1,11 @@
-﻿using Jowsy.Revit.KernelAddin.Core;
+﻿using Autodesk.Revit.UI;
+using Jowsy.Revit.KernelAddin.Core;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.Connection;
 using System.Collections.ObjectModel;
 using System.IO.Pipes;
 using System.Reactive.Linq;
+using System.Runtime.Remoting.Contexts;
 
 namespace Jowsy.Revit.KernelAddin.UI
 {
@@ -12,6 +14,7 @@ namespace Jowsy.Revit.KernelAddin.UI
         public RelayCommand StartCommand { get; }
         public RelayCommand RestartCommand { get; }
         private const string NamedPipeName = "revit-kernel-2024-pipe";
+        private readonly UIApplication _uiApp;
         private ObservableCollection<CommandViewItem> _kernelCommands = new ObservableCollection<CommandViewItem>();
         private Variables _variablesStore;
         private CompositeKernel _kernel;
@@ -40,67 +43,69 @@ namespace Jowsy.Revit.KernelAddin.UI
 
         public ViewModel()
         {
-
+            
             _variablesStore = new Variables();
             _variablesStore.VariablesChanged += _variablesStore_VariablesChanged;
 
-            StartCommand = new RelayCommand((c) =>
+            StartCommand = new RelayCommand(async (c) =>
             {
-                InitKernel();
+                await InitKernel();
             });
 
 
-            RestartCommand = new RelayCommand((c) =>
+            RestartCommand = new RelayCommand(async (c) =>
             {
                 DisposeKernel();
+                await InitKernel();
             });
-
-
+    
         }
         public void DisposeKernel()
         {
             _kernel.Dispose();
+            
+            _variablesStore = new Variables();
 
+            Variables?.Clear();
+
+            KernelCommands?.Clear();
         }
 
-        public void InitKernel()
+        public async Task InitKernel()
         {
-            //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
-
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("netstandard")).ToList();
 
             _kernel = new CompositeKernel();
 
-            //Microsoft.DotNet.Interactive.Formatting.PocketView pocketView = new Microsoft.DotNet.Interactive.Formatting.PocketView();
             var str = Microsoft.DotNet.Interactive.Formatting.Formatter.DefaultMimeType;
-            //Perkele! 
+
             _kernel.KernelEvents.ObserveOn(SynchronizationContext.Current).Subscribe(new KernelObserver(this), new CancellationToken());
+
             var revitKernel = new RevitKernel("RevitKernel", _variablesStore);
 
             _kernel.Add(revitKernel);
+
             revitKernel.UseValueSharing();
 
-            revitKernel.AddMiddleware(async (command, context, next) =>
-            {
-                /*if (RunOnDispatcher)
-                {
-                    await Dispatcher.InvokeAsync(async () => await next(command, context));
-                }
-                else
-                {*/
-
-                /*  await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
-                          KernelCommands.Add(new KernelCommandViewItem()
-                          {
-                              Name = command.GetType().Name
-
-                          }));*/
-
-                await next(command, context);
-                //}
-            });
             SetUpNamedPipeKernelConnection();
+
+            await SetupInitialVariables();
         }
+
+        private async Task SetupInitialVariables()
+        {
+            App.KernelInitEventHandler.Tcs = new TaskCompletionSource<bool>();
+
+            App.InitKernelEvent.Raise();
+            
+            await App.KernelInitEventHandler.Tcs.Task;
+
+            var uiApp = App.KernelInitEventHandler.UIApplication;
+             _variablesStore.Add("uiapp", uiApp);
+            _variablesStore.Add("uidoc", uiApp.ActiveUIDocument);
+            _variablesStore.Add("doc", uiApp.ActiveUIDocument.Document);
+
+        }
+
         private void _variablesStore_VariablesChanged(object sender, EventArgs e)
         {
             Variables = new ObservableCollection<VariableViewItem>(_variablesStore.GetVariables()

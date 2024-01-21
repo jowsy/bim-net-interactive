@@ -18,7 +18,6 @@ namespace Jowsy.Revit.KernelAddin.Core
         public void Add(string name, object value)
         {
 
-
             if (!_variables.ContainsKey(name))
             {
                 _variables.Add(name, value);
