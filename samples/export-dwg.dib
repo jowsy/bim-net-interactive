@@ -4,9 +4,9 @@
 
 #!csharp
 
-#r "nuget:DotNet.Interactive.Extensions.Revit"
+#r "nuget:Jowsy.DotNet.Interactive.Extensions"
 
-#i "C:\git\bim-net-interactive\src\DotNet.Interactive.Extensions.Revit\bin\Debug\"
+#i "C:\git\bim-net-interactive\src\Jowsy.DotNet.Interactive.Extensions\bin\Debug"
 //using DotNet.Interactive.Extensions.Revit;
 
 #!csharp
@@ -20,28 +20,24 @@
  Document doc = uidoc.Document;
 // Prepare a filter to collect all ViewSheet elements
     FilteredElementCollector collector = new FilteredElementCollector(doc);
-    var list = collector.OfClass(typeof(ViewSheet)).Select(vs => new { viewId = vs.Id.ToString(),
-                                                            name = vs.Name}).ToList();;
+    collector.OfClass(typeof(ViewSheet));
 
+    // Create a collection to store the ViewSheet element ids
+    ICollection<ElementId> sheetIds = new List<ElementId>();
 
-list
+    List<ElementId> ids = new List<ElementId>();
+    // Iterate through the collected elements and add their ids to the collection
+    foreach (ViewSheet vs in collector)
+    {
+        //display($"{vs.Id}\n");
+        ids.Add(vs.Id);
+    }
 
-#!csharp
-
-#!revit24
-Selection selection = uidoc.Selection;
-Document doc = uidoc.Document;
-ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
-var id = selectedIds.FirstOrDefault();
-var wall = doc.GetElement(id) as Wall;
-var geom = wall.get_Geometry(new Options());
-geom
+ids
 
 #!csharp
 
-#!set --value @revit24:list --name list
-
-list.Display("html")
+#!set --value @revit24:ids --name ids
 
 #!csharp
 
@@ -55,6 +51,7 @@ using Autodesk.Revit.UI;
 #!revit24
 
    Document doc = uidoc.Document;
+   
     // Set up the DWG export options
     DWGExportOptions dwgOptions = new DWGExportOptions();
     dwgOptions.ExportOfSolids = SolidGeometry.ACIS;
@@ -62,12 +59,19 @@ using Autodesk.Revit.UI;
     dwgOptions.SharedCoords = false; // set to true if you want to use shared coordinates
     dwgOptions.FileVersion = ACADVersion.R2018; // set the DWG version
     // Create a set to contain the view id(s) to be exported
-    ICollection<ElementId> viewIds = new List<ElementId>();
-    viewIds.Add(new ElementId(359502));
-
     // Perform the export
-    doc.Export("c:\\temp\\", "export2.dwg", viewIds, dwgOptions);
+    doc.Export("c:\\temp\\", "export4.dwg", ids, dwgOptions);
+
+#!csharp
+
+#!revit24
+
+var x = ids;
+
+#!csharp
+
+#!autocad24
 
 #!pwsh
 
-Start-Process "C:\Program Files\Autodesk\AutoCAD 2023\acad.exe" -ArgumentList "C:\temp\export2.dwg" 
+Start-Process "C:\Program Files\Autodesk\AutoCAD 2023\acad.exe" -ArgumentList "C:\temp\export3.dwg"

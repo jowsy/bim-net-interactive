@@ -1,6 +1,8 @@
-﻿using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using Jowsy.Revit.KernelAddin.Core;
 using Jowsy.Revit.KernelAddin.UI;
+using Microsoft.DotNet.Interactive.Formatting;
 using System.IO;
 using System.Reflection;
 
@@ -8,10 +10,13 @@ namespace Jowsy.Revit.KernelAddin
 {
     public class App : IExternalApplication
     {
-        public static ExternalEvent ExternalEvent;
+        public static ExternalEvent KernelEvent;
+        public static ExternalEvent InitKernelEvent;
 
         public static DockablePaneId DockablePaneId = new DockablePaneId(new Guid("3776E883-839D-4D43-8498-8C7D2345C1CB"));
         internal static RevitKernelExternalEventHandler KernelEventHandler;
+        internal static KernelInitEventHandler KernelInitEventHandler;
+
         public Result OnShutdown(UIControlledApplication application)
         {
             return Result.Cancelled;
@@ -37,15 +42,27 @@ namespace Jowsy.Revit.KernelAddin
             var showButtonData = new PushButtonData(showCommand.FullName, "Show\nDockable Pane)", Assembly.GetAssembly(showCommand).Location, showCommand.FullName);
             ribbonPanel.AddItem(showButtonData);
 
-
             KernelEventHandler = new RevitKernelExternalEventHandler();
-            ExternalEvent = ExternalEvent.Create(KernelEventHandler);
+            KernelEvent = ExternalEvent.Create(KernelEventHandler);
 
+            KernelInitEventHandler = new KernelInitEventHandler();
+            InitKernelEvent = ExternalEvent.Create(KernelInitEventHandler);
 
             var kernelPaneProvider = new KernelDockablePaneProvider(new ViewModel());
             application.RegisterDockablePane(DockablePaneId, "NETInteractive Revit Kernel", kernelPaneProvider);
 
+           Formatter.SetPreferredMimeTypesFor(typeof(Element), "text/html");
 
+            Formatter.Register(
+                type: typeof(Document),
+                formatter: (list, writer) =>
+                {
+       
+                        writer.WriteLine($"{list.ToString()}");
+        
+                }, "text/plain");
+            //It's common for object graphs to contain reference cycles. The .NET Interactive formatter will traverse object graphs but in order to avoid both oversized outputs and possible infinite recursion when there is a reference cycle, the formatter will only recurse to a specific depth.
+            Formatter.RecursionLimit = 3;
             return Result.Succeeded;
         }
 
