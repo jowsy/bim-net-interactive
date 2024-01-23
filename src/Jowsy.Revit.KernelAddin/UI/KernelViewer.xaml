@@ -10,16 +10,17 @@
     <Page.Resources>
 
         <ResourceDictionary>
+            <local:EnumToStringConverter x:Key="EnumToStringConverter"/>
             <ResourceDictionary.MergedDictionaries>
-
+                
                 <!--Colors are shared by different controls-->
                 <!--http://stackoverflow.com/questions/17057934/wpf-merged-resource-dictionary-no-being-recognized-from-app-xaml-->
                 <!--<ResourceDictionary Source="/RetroUI;component/Themes/Colors.Retro.xaml"/>-->
 
                 <ResourceDictionary Source="/RetroUI;component/Themes/Generic.xaml"/>
-
+          
             </ResourceDictionary.MergedDictionaries>
-
+            
         </ResourceDictionary>
     </Page.Resources>
 
@@ -30,13 +31,49 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button VerticalAlignment="Center" Padding="1" Margin="2" Command="{Binding StartCommand}">Start</Button>
-            <Button VerticalAlignment="Center" Padding="1"  Margin="2" Command="{Binding RestartCommand}">Restart</Button>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" VerticalAlignment="Center" Padding="1" Margin="2" Command="{Binding StartCommand}" IsEnabled="{Binding StartButtonEnabled, UpdateSourceTrigger=PropertyChanged}">Start
+            </Button>
+            <Button Grid.Column="1" VerticalAlignment="Center" Padding="1"  Margin="2" Command="{Binding RestartCommand}">Restart</Button>
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding KernelStatus, Converter={StaticResource EnumToStringConverter}, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0">
+
+            </TextBlock>
+            <Canvas Grid.Column="3" Height="25" Width="25">
+                <Ellipse
+                Width="25"
+                Height="25"
+                Stroke="Black"
+                StrokeThickness="2">
+                    <Ellipse.Style>
+                        <Style TargetType="{x:Type Ellipse}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=KernelStatus}" Value="0">
+                                    <Setter Property="Fill" Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=KernelStatus}" Value="1">
+                                    <Setter Property="Fill" Value="Orange"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=KernelStatus}" Value="2">
+                                    <Setter Property="Fill" Value="Green"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Ellipse.Style>
+                </Ellipse>
+             </Canvas>
+        </Grid>
+  
+          
             <!--  <fa:ImageAwesome  Icon="Connectdevelop" VerticalAlignment="Center" Width="20" Spin="True" SpinDuration="4" Margin="5"/>-->
             <!--<TextBlock Text="Kernel is running" VerticalAlignment="Center"/>-->
             
-        </StackPanel>
+ 
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>

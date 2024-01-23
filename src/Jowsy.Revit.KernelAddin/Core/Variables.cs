@@ -21,19 +21,25 @@ namespace Jowsy.Revit.KernelAddin.Core
             if (!_variables.ContainsKey(name))
             {
                 _variables.Add(name, value);
-                VariablesChanged.Invoke(this, EventArgs.Empty);
+                VariablesChanged?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
             _variables[name] = value;
-            VariablesChanged.Invoke(this, EventArgs.Empty);
+            VariablesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void Remove(string name, object value)
         {
 
             _variables.Remove(name);
-            VariablesChanged.Invoke(this, EventArgs.Empty);
+            VariablesChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void Clear()
+        {
+            _variables.Clear();
+            VariablesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         internal bool TryGetValue(string name, out object value)

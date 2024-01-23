@@ -19,6 +19,19 @@ namespace Jowsy.Revit.KernelAddin.UI
         private Variables _variablesStore;
         private CompositeKernel _kernel;
 
+        private KernelStatus _kernelStatus;
+
+        public KernelStatus KernelStatus
+        {
+            get { return _kernelStatus; }
+            set { _kernelStatus = value;
+                OnPropertyChanged(nameof(KernelStatus));
+                OnPropertyChanged(nameof(StartButtonEnabled));
+            }
+        }
+
+        public bool StartButtonEnabled => KernelStatus == KernelStatus.Stopped;
+
         public ObservableCollection<CommandViewItem> KernelCommands
         {
             get { return _kernelCommands; }
@@ -63,8 +76,8 @@ namespace Jowsy.Revit.KernelAddin.UI
         public void DisposeKernel()
         {
             _kernel.Dispose();
-            
-            _variablesStore = new Variables();
+
+            _variablesStore.Clear();
 
             Variables?.Clear();
 
@@ -88,7 +101,7 @@ namespace Jowsy.Revit.KernelAddin.UI
 
             SetUpNamedPipeKernelConnection();
 
-            await SetupInitialVariables();
+            KernelStatus = KernelStatus.AwaitingConnection;
         }
 
         private async Task SetupInitialVariables()
@@ -139,12 +152,14 @@ namespace Jowsy.Revit.KernelAddin.UI
             _kernel.RegisterForDisposal(receiver);
             _kernel.RegisterForDisposal(serverStream);
 
-            var _ = Task.Run(() =>
+            var _ = Task.Run(async () =>
             {
                 // required as waiting connection on named pipe server will block
                 serverStream.WaitForConnection();
                 var _host = host.ConnectAsync();
-
+                await SetupInitialVariables();
+                KernelStatus = KernelStatus.Connected;
+               
             });
         }
 
