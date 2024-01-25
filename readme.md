@@ -14,14 +14,15 @@ Supported languages:
 - [ ] Python
 
 ### Prequisities
+- [x] Git
 - [x] VSCode
 - [x] VSCode Polyglot Notebook Extension
 - [x] Autodesk Revit 2024
 
 ## How to get started
-
-1. Open Visual Studio Code and open folder /src as working directory. Make sure that Polyglot Notebook extension is installed!
-2. Open GetStarted.ipynb and follow instructions. In the notebook you will run code to build necessary assemblies, packages and installing addins.
+1. Clone this repo
+2. Open Visual Studio Code and open folder /src as working directory. Make sure that Polyglot Notebook extension is installed!
+3. Open GetStarted.ipynb and follow instructions. In the notebook you will run code to build necessary assemblies, packages and installing addins.
 
 ## License
 
