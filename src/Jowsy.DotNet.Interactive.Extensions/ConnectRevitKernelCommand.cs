@@ -53,20 +53,10 @@ namespace Jowsy.DotNet.Interactive.Extensions
                                                                         true, 
                                                                         async () =>
                                                                         {
-                                                                        context.DisplayStandardOut($"Requesting value infos...");
                                                                         var result = await proxyKernel.SendAsync(new RequestValueInfos());
 
                                                                         var valueInfosProduced = result.Events.Where(e => e is ValueInfosProduced)
                                                                                                         .FirstOrDefault() as ValueInfosProduced;
-
-                                                                        if (valueInfosProduced != null)
-                                                                        {
-                                                                            context.DisplayStandardOut($"Value info received...");
-                                                                            foreach (var item in valueInfosProduced.ValueInfos)
-                                                                            {
-                                                                                context.DisplayStandardOut($"Name: {item.Name}, TypeName: {item.TypeName}: Value:{item.FormattedValue.Value}\n");
-                                                                            }
-                                                                        }
                                                                         if (valueInfosProduced == null)
                                                                         {
                                                                             return null;
