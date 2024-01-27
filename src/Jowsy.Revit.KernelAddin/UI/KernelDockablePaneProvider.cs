@@ -8,7 +8,6 @@ namespace Jowsy.Revit.KernelAddin.UI
         private KernelViewer _dockableWindow;
         internal static ViewModel _viewModel;
 
-
         public KernelDockablePaneProvider(ViewModel viewModel)
         {
             _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));

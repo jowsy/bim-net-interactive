@@ -13,8 +13,8 @@ namespace Jowsy.Revit.KernelAddin.Core
         internal TaskCompletionSource<bool> Tcs = null;
         public void Execute(UIApplication app)
         {
-         UIApplication = app;
-         Tcs.SetResult(true);
+             UIApplication = app;
+             Tcs.SetResult(true);
         }
 
         public string GetName()

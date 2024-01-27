@@ -36,7 +36,7 @@ namespace Jowsy.Revit.KernelAddin.Core
 
 
             KernelInfo.LanguageName = "C#";
-            KernelInfo.LanguageVersion = "12.0";
+            KernelInfo.LanguageVersion = "7.3"; //All .NET framework
             KernelInfo.DisplayName = $"RevitKernel - C# Script";
             _variablesStore = variablesStore ?? throw new ArgumentNullException(nameof(variablesStore));
 
@@ -59,12 +59,7 @@ namespace Jowsy.Revit.KernelAddin.Core
                     _variablesStore.Add(result.Item1, result.Item2);
                 }
             }
-            // context.DisplayStandardOut("Revit code was executed");
-
             context.Complete(command);
-
-
-
         }
 
         public Task HandleAsync(RequestValue command, KernelInvocationContext context)

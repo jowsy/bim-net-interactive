@@ -12,15 +12,7 @@ namespace Jowsy.Revit.KernelAddin
         {
             DockablePane dockableWindow = commandData.Application.GetDockablePane(App.DockablePaneId);
 
-
-            /*   if (!KernelDockablePaneProvider._viewModel.KernelIsRunning())
-               {
-                   KernelDockablePaneProvider._viewModel.InitKernel();
-               }*/
-
             dockableWindow.Show();
-
-
 
             return Result.Succeeded;
         }

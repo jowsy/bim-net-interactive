@@ -146,7 +146,7 @@ namespace Jowsy.Revit.KernelAddin.UI
                 new Uri("kernel://remote-control"));
             var receiver = KernelCommandAndEventReceiver.FromNamedPipe(serverStream);
 
-            var host = _kernel.UseHost(sender, receiver, new Uri("kernel://my-wpf-app"));
+            var host = _kernel.UseHost(sender, receiver, new Uri("kernel://revit-kernel-2024"));
 
             _kernel.RegisterForDisposal(host);
             _kernel.RegisterForDisposal(receiver);

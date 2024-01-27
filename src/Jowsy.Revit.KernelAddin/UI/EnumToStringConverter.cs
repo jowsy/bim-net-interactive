@@ -27,8 +27,6 @@ namespace Jowsy.Revit.KernelAddin.UI
             }
 
             return DependencyProperty.UnsetValue;
-
-
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

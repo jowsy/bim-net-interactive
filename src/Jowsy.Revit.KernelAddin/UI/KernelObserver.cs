@@ -41,7 +41,6 @@ namespace Jowsy.Revit.KernelAddin.UI
 
 
             });
-            // throw new NotImplementedException();
         }
     }
 }
