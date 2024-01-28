@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 using Jowsy.Revit.KernelAddin;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -82,8 +83,7 @@ namespace Jowsy.Revit.KernelAddin.Core
                                             .Select(v => 
                                                     new KernelValueInfo(v.Key,                         
                                                     CreateSingleFromObject(v.Value, PlainTextSummaryFormatter.MimeType), 
-                                                    v.Value.GetType(),
-                                                    v.Value.GetType().Name))
+                                                    v.Value.GetType()))
                                             .ToArray();
 
             context.Publish(new ValueInfosProduced(valueInfos, command));

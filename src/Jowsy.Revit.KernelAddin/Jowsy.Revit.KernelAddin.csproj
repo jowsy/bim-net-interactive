@@ -32,29 +32,25 @@
   </ItemGroup>
 	<Target Name="CopyFiles" AfterTargets="CoreBuild">
 		<ItemGroup>
-			<RootItem Include="$(ProjectDir)*.addin"/>
-			<AddinItem Include="$(TargetDir)**\*"/>
+			<RootItem Include="$(ProjectDir)*.addin" />
+			<AddinItem Include="$(TargetDir)*.dll" />
+			<AddinItem Include="$(TargetDir)*.pdb" />
 		</ItemGroup>
 
 		<PropertyGroup>
-			<RootDir>bin\$(RevitVersion) $(Configuration)\</RootDir>
+			<RootDir>bin\AddIn $(RevitVersion) $(Configuration)\</RootDir>
 			<AddinDir>$(RootDir)$(AssemblyName)\</AddinDir>
 		</PropertyGroup>
 
-		<Copy SourceFiles="@(RootItem)" DestinationFolder="$(RootDir)%(RecursiveDir)"/>
-		<Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AddinDir)%(RecursiveDir)"/>
-		
+		<Copy SourceFiles="@(RootItem)" DestinationFolder="$(RootDir)" />
+		<Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AddinDir)" />
+
 		<ItemGroup>
-			<AddinFiles Include="$(RootDir)**\*.*"/>
+			<AddinFiles Include="$(RootDir)**\*.*" />
 		</ItemGroup>
-
-		<Copy SourceFiles="@(AddinFiles)"
-              DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)"/>
+		<Message Text="Copy files to Addin folder" Importance="high" />
+		<Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))" />
 	</Target>
 
-	<Target Name="DeleteFiles" AfterTargets="Clean">
-		<RemoveDir Directories="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\$(ProjectName)"/>
-		<Delete Files="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\$(ProjectName).addin"/>
-	</Target>
 
 </Project>

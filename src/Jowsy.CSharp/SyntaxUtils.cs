@@ -18,7 +18,9 @@ namespace Jowsy.CSharp
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.DB.IFC;
 using System.Collections;
+using Autodesk.Revit.UI.Selection;
 using System.Linq;
 using System.Collections.Generic;
 using Jowsy.Revit.KernelAddin.Core;
@@ -154,6 +156,10 @@ namespace Jowsy.Revit.KernelAddin.Core
 
                 if (valueInfo != null)
                 {
+
+                    string typeName = valueInfo.TypeName;
+                    //TypeSyntaxFactory.GetTypeSyntax()
+
                     var valueInfoNode = SyntaxFactory.ParseStatement($"{valueInfo.TypeName} {valueInfo.Name} = ({valueInfo.TypeName})__variables.GetVariables()[\"{valueInfo.Name}\"];");
                     nodesToAppend.Add(valueInfoNode);
                 }

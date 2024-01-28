@@ -15,6 +15,7 @@ using Microsoft.DotNet.Interactive.ValueSharing;
 using Microsoft.DotNet.Interactive.Connection;
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.Events;
+
 //Influenced by https://github.com/RickStrahl/Westwind.Scripting/blob/master/Westwind.Scripting/CSharpScriptExecution.cs#L1254
 namespace Jowsy.CSharp
 {
@@ -40,8 +41,8 @@ namespace Jowsy.CSharp
             AddAssembly("C:\\git\\bim-net-interactive\\src\\Jowsy.Revit.KernelAddin\\bin\\Debug R24\\Jowsy.Revit.KernelAddin.dll");
             AddAssembly("C:\\Program Files\\Autodesk\\Revit 2024\\RevitAPI.dll");
             AddAssembly("C:\\Program Files\\Autodesk\\Revit 2024\\RevitAPIUI.dll");
-
-            // this library and CodeAnalysis libs
+            AddAssembly("C:\\Program Files\\Autodesk\\Revit 2024\\RevitAPIIFC.dll");
+           
             AddAssembly(typeof(ReferenceList)); // Scripting Library
         }
         public bool AddAssembly(string assemblyDll)
