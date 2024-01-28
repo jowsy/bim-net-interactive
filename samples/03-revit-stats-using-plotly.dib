@@ -1,0 +1,56 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+#r "nuget:Jowsy.DotNet.Interactive.Extensions"
+
+#i "C:\git\bim-net-interactive\src\Jowsy.DotNet.Interactive.Extensions\bin\Debug"
+
+#!fsharp
+
+#!connect revit --kernel-name revit24 --revit-version 2024
+
+#!csharp
+
+#!revit24   
+  var collector = new FilteredElementCollector( doc, uidoc.ActiveView.Id);
+ 
+  var query = collector
+            .WhereElementIsNotElementType()
+            .WhereElementIsViewIndependent()
+            .ToElements();
+
+   var result = query.GroupBy(x => x.Category.Name).Select(y => new {
+      Id = y.Key,
+      Count = y.Count()
+   }).ToList();
+
+display(result);
+   result
+
+#!fsharp
+
+#!set --value @revit24:result --name categoryStats
+
+#!fsharp
+
+#r "nuget: FSharp.Data, 6.3.0"
+#r "nuget: Plotly.NET, 4.2.0"
+#r "nuget: Plotly.NET.Interactive, 4.2.0"
+
+#!fsharp
+
+open Plotly.NET
+open FSharp.Data
+open FSharp.Data.JsonExtensions
+
+let data = JsonValue.Parse(categoryStats.RootElement.GetRawText());
+let xData = data.AsArray() |> Seq.map (fun item -> item.GetProperty("Id").AsString())
+let yData = data.AsArray() |> Seq.map (fun item -> item.GetProperty("Count").AsInteger())
+let chart =
+    Chart.Column(yData, xData)
+    |> Chart.withTitle "Number of Instances by Category"
+
+chart
