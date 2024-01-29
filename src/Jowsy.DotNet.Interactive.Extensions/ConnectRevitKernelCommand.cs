@@ -65,12 +65,17 @@ namespace Jowsy.DotNet.Interactive.Extensions
                   
                                                                         });
 
-                    if (results.AssemblyPath == null)
+                    if (results.AssemblyPath != null)
+                    {
+                        await proxyKernel.SendAsync(new SendValue("assemblyPath", results.AssemblyPath, FormattedValue.CreateSingleFromObject(results.AssemblyPath)));
+
+                    }
+                    else
                     {
                         context.DisplayStandardError(results.DiagnosticText);
-                        context.Fail(command);
+                        await proxyKernel.SendAsync(new SendValue("assemblyPath", ""));
                     }
-                    await proxyKernel.SendAsync(new SendValue("assemblyPath", results.AssemblyPath, FormattedValue.CreateSingleFromObject(results.AssemblyPath)));
+
 
                     await next(command, context);
                 }

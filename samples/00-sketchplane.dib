@@ -43,7 +43,7 @@ SketchPlane sketchPlane = null;
                 tx.Commit();      
 
         }
-
+display(sketchPlane);
 sketchPlane
             
 
@@ -70,102 +70,8 @@ using (Transaction tx = new Transaction(doc))
                 // Commit the transaction
                 tx.Commit();
         }
-
+display(curve);
 curve
-
-#!markdown
-
-https://thebuildingcoder.typepad.com/blog/2008/11/model-line-creation.html
-
-
-To create a wall from a model curve using the Revit API, you would typically use the `Document.Create.NewWall` method, which allows you to create a wall along a curve. The curve must be a model curve (not a detail curve), and the wall will be created based on the curve's location in the model.
-
-Here is a simplified example of how you might create a wall from a model curve using C# in the Revit API:
-
-```csharp
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.Attributes;
-
-[Transaction(TransactionMode.Manual)]
-public class CreateWallFromCurveExample : IExternalCommand
-{
-    public Result Execute(
-      ExternalCommandData commandData, 
-      ref string message, 
-      ElementSet elements)
-    {
-        UIDocument uidoc = commandData.Application.ActiveUIDocument;
-        Document doc = uidoc.Document;
-
-        // Start a new transaction
-        using (Transaction tx = new Transaction(doc))
-        {
-            tx.Start("Create Wall");
-
-            try
-            {
-                // Define the start and end points for the line
-                XYZ startPoint = new XYZ(0, 0, 0);
-                XYZ endPoint = new XYZ(10, 0, 0);
-
-                // Create a line to use as the basis for the wall
-                Line line = Line.CreateBound(startPoint, endPoint);
-
-                // Create a model curve from the line
-                // Note: Model curves need to be created in a sketch plane
-                SketchPlane sketchPlane = SketchPlane.Create(doc, Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero));
-                ModelCurve modelCurve = doc.Create.NewModelCurve(line, sketchPlane);
-
-                // Retrieve the wall type to use for the new wall
-                WallType wallType = new FilteredElementCollector(doc)
-                    .OfClass(typeof(WallType))
-                    .OfType<WallType>()
-                    .FirstOrDefault(wt => wt.Name.Equals("Basic Wall")); // Specify the wall type name here
-
-                // Define the level at which the wall should be placed
-                Level level = new FilteredElementCollector(doc)
-                    .OfClass(typeof(Level))
-                    .OfType<Level>()
-                    .FirstOrDefault(lv => lv.Name.Equals("Level 1")); // Specify the level name here
-
-                // Create the wall using the model curve
-                if (wallType != null && level != null)
-                {
-                    Wall wall = Wall.Create(doc, modelCurve.GeometryCurve, wallType.Id, level.Id, 10, 0, false, false);
-                }
-                else
-                {
-                    throw new InvalidOperationException("Could not find specified wall type or level.");
-                }
-
-                tx.Commit();
-                return Result.Succeeded;
-            }
-            catch (Exception ex)
-            {
-                message = ex.Message;
-                tx.RollBack();
-                return Result.Failed;
-            }
-        }
-    }
-}
-```
-
-In this example, the code does the following:
-
-1. Creates a transaction, which is required to make changes to the Revit document.
-2. Defines the start and end points and creates a line between them.
-3. Creates a sketch plane needed for the model curve.
-4. Creates a model curve from the line and the sketch plane.
-5. Retrieves a wall type and a level from the document to use for the new wall.
-6. Creates a wall along the model curve's geometry curve.
-7. Commits the transaction to finalize changes.
-
-Please ensure that you replace `"Basic Wall"` and `"Level 1"` with the actual names of the wall type and level you want to use. Also, adjust the wall's height and offset if needed.
-
-Remember that this code should be executed within the Revit API context, such as in an external command, and that you have the necessary using directives at the top of your code file to reference Autodesk.Revit.DB and Autodesk.Revit.UI namespaces.
 
 #!csharp
 
@@ -187,22 +93,25 @@ wallType
 #!revit24
 
      // Define the level at which the wall should be placed
-                Level level = new FilteredElementCollector(document)
+                Level level = new FilteredElementCollector(doc)
                     .OfClass(typeof(Level))
                     .OfType<Level>()
                     .FirstOrDefault();
 display(level);
+level
 
 #!csharp
 
     
-    #!revit24
+#!revit24
 
           using (Transaction tx = new Transaction(doc))
         {
             tx.Start("Create Wall");
 
-            Wall wall = Wall.Create(document, curve.GeometryCurve, wallType.Id, level.Id, 10, 0, false, false);
+            Wall wall = Wall.Create(doc, curve.GeometryCurve, wallType.Id, level.Id, 10, 0, false, false);
 
             tx.Commit();
+
+            display(wall);
         }

@@ -50,16 +50,20 @@ namespace Jowsy.Revit.KernelAddin.Core
             App.KernelEventHandler.Variables = _variablesStore;
 
             _variablesStore.TryGetValue("assemblyPath", out string dllPath);
-            if (dllPath != null)
+
+            if (string.IsNullOrEmpty(dllPath))
             {
-                App.KernelEventHandler.CompiledDllPath = dllPath;
-                App.KernelEvent.Raise();
-                var result = await App.KernelEventHandler.tcs.Task;
-                if (result != (null, null))
-                {
-                    _variablesStore.Add(result.Item1, result.Item2);
-                }
+                context.Fail(command);
             }
+
+            App.KernelEventHandler.CompiledDllPath = dllPath;
+            App.KernelEvent.Raise();
+            var result = await App.KernelEventHandler.tcs.Task;
+            if (result != (null, null))
+            {
+                _variablesStore.Add(result.Item1, result.Item2);
+            }
+            
             context.Complete(command);
         }
 
