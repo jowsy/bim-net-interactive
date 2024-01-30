@@ -16,6 +16,7 @@ Supported languages:
 - [ ] Python
 
 ### Prequisities
+- [x] SDKs for .NET framework 4.8 and NET 8
 - [x] Git
 - [x] VS Code
 - [x] VS Code Polyglot Notebook Extension
