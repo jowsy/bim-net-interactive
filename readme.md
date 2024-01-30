@@ -1,12 +1,10 @@
 # Embedded NET Interactive Revit Kernel
-**Bringing 📜Literary Programming to Autodesk Revit**
 
-Run Autodesk Revit API code live with Visual Studio Code Polyglot Notebook extension.
-The objective is to:
-* Let users develop in their own thought patterns and reducing the otherwise quite high ceremony of setting up a Revit addin project in Visual Studio. 
-* Act as a experimentation and learning tool for coding up short snippets or program units that finally can be composed into a larger program.
-* Explore new possibilites with sharing between other language Kernels, for example Python in Jupyter.
 
+This project aims to create documents or notebooks containing live Revit C#-scripts, visualizations, and narrative text. 
+A simple way to document and demonstrate automations or simply experiment with code. This allows for cell-to-cell execution of revit API code in any order where results can be shared by reference between "code cells" in VS Code Polyglot Notebooks.
+
+The solution constists of an extension to VS Code Polyglot Notebooks and an addin to Revit that acts as a data environment where variables are stored in memory during a session.
 
 ![](./samples/screenshot.png)
 
