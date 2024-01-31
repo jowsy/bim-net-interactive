@@ -28,6 +28,12 @@ Supported languages:
 
 > 💥 **There is a third-party dll conflict between NET interactive and Autodesk BIM 360 Issues addin. In order to get the full experience you have to temporarily disable the BIM 360 Issues addin. Variable sharing will not work when the addin is enabled.**
 
+## Aknowledgements and third-party dependencies
+
+* This solution stands steadily on [NET Interactive](https://github.com/dotnet/interactive) for handling inter-process communication.
+* Got a lot inspiration from [RevitAddinManager](https://github.com/chuongmep/RevitAddInManager) for how to configure csproj.
+* Credit to Alexander Sharykin for his [https://github.com/jowsy/RetroUI](RetroUI) WPF theme (forked by me and adapted for use in a Revit addin).
+
 ## License
 
 MIT
