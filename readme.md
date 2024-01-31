@@ -1,7 +1,7 @@
 # Revit Polyglot Notebook
 
 This project aims to create documents or notebooks containing live Revit C#-scripts, visualizations, and narrative text. 
-A simple way to document and demonstrate automations or simply experiment with code. This allows for cell-to-cell execution of revit API code in any order where results can be shared by reference between "code cells" in VS Code Polyglot Notebooks.
+A simple way to document and demonstrate automations or simply experiment with code. This allows for cell-to-cell execution of revit API code in any order where results can be shared by reference between "code cells" in a notebook.
 
 The solution constists of an extension to VS Code Polyglot Notebooks and an addin to Revit that acts as a data environment where variables are stored in memory during a session.
 
