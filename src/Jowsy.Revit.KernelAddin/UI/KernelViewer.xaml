@@ -5,46 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Jowsy.Revit.KernelAddin.UI"
              mc:Ignorable="d" 
-             Background="white"
+             xmlns:dxg="urn:tom-englert.de/DataGridExtensions" 
+    Background="white"
              d:DesignHeight="450" d:DesignWidth="800">
     <Page.Resources>
-
         <ResourceDictionary>
             <local:EnumToStringConverter x:Key="EnumToStringConverter"/>
             <ResourceDictionary.MergedDictionaries>
-                
-                <!--Colors are shared by different controls-->
-                <!--http://stackoverflow.com/questions/17057934/wpf-merged-resource-dictionary-no-being-recognized-from-app-xaml-->
-                <!--<ResourceDictionary Source="/RetroUI;component/Themes/Colors.Retro.xaml"/>-->
-
                 <ResourceDictionary Source="/RetroUI;component/Themes/Generic.xaml"/>
-          
             </ResourceDictionary.MergedDictionaries>
-            
         </ResourceDictionary>
     </Page.Resources>
-
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition/>
-            <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid>
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="100"/>
-                <ColumnDefinition/>
                 <ColumnDefinition Width="30"/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" VerticalAlignment="Center" Padding="1" Margin="2" Command="{Binding StartCommand}" IsEnabled="{Binding StartButtonEnabled, UpdateSourceTrigger=PropertyChanged}">Start
             </Button>
             <Button Grid.Column="1" VerticalAlignment="Center" Padding="1"  Margin="2" Command="{Binding RestartCommand}">Restart</Button>
-            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding KernelStatus, Converter={StaticResource EnumToStringConverter}, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0">
-
-            </TextBlock>
-            <Canvas Grid.Column="3" Height="25" Width="25">
+            <TextBlock Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding KernelStatus, Converter={StaticResource EnumToStringConverter}, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,0,0"/>
+            <Canvas Grid.Column="2" Height="25" Width="25">
                 <Ellipse
                 Width="25"
                 Height="25"
@@ -66,38 +54,28 @@
                         </Style>
                     </Ellipse.Style>
                 </Ellipse>
-             </Canvas>
+            </Canvas>
         </Grid>
-  
-          
-            <!--  <fa:ImageAwesome  Icon="Connectdevelop" VerticalAlignment="Center" Width="20" Spin="True" SpinDuration="4" Margin="5"/>-->
-            <!--<TextBlock Text="Kernel is running" VerticalAlignment="Center"/>-->
-            
- 
+        <TabControl x:Name="tabControl" Grid.Row="1">
+            <TabItem Header="Variables">
+                <DataGrid Grid.Row="1" Margin="0,5,0,0" RowHeaderWidth="16" 
+                        Padding="5"
+                        dxg:DataGridFilter.IsAutoFilterEnabled="True"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                        ItemsSource="{Binding Path=Variables}"/>
+            </TabItem>
+            <TabItem Header="Events">
+                <DataGrid Grid.Row="1" 
+                              Margin="0,5,0,0" 
+                              RowHeaderWidth="16" 
+                              Padding="5"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              dxg:DataGridFilter.IsAutoFilterEnabled="True"
+                              ItemsSource="{Binding Path=KernelCommands}"/>
 
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="25"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" VerticalAlignment="Center" FontWeight="Bold">Events</TextBlock>
-            <DataGrid Grid.Row="1" Margin="0,5,0,0" RowHeaderWidth="16" 
-            Padding="5"
-            CanUserAddRows="False"
-            ItemsSource="{Binding Path=KernelCommands}"/>
-        </Grid>
-
-        <Grid Grid.Row="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="25"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" VerticalAlignment="Center" FontWeight="Bold">Variables</TextBlock>
-            <DataGrid Grid.Row="1" Margin="0,5,0,0" RowHeaderWidth="16" 
-    Padding="5"
-    CanUserAddRows="False"
-    ItemsSource="{Binding Path=Variables}"/>
-        </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
-    
 </Page>

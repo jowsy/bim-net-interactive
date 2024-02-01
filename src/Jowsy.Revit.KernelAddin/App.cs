@@ -53,7 +53,7 @@ namespace Jowsy.Revit.KernelAddin
         {
             try
             {
-                if (args.Name.Contains("Encodings") || args.Name.Contains("Retro"))
+                if (args.Name.Contains("Encodings") || args.Name.Contains("Retro") || args.Name.Contains("GridExtensions"))
                 {
                     string filename = Path.GetDirectoryName(typeof(ViewModel).Assembly.Location);
 
