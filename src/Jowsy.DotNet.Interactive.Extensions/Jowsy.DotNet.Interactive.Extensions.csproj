@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<Version>1.82.0</Version>
+	<Version>0.1.0</Version>
 	<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
@@ -14,6 +14,7 @@
 		<PackageTags>dotnet-interactive</PackageTags>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageVersion>$(version)-alpha</PackageVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
