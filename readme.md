@@ -27,7 +27,9 @@ The solution constists of an extension to VS Code Polyglot Notebooks and an addi
 
 ## Examples
 
-![](./samples/example2.gif)
+Extracting profile geometry from floor and export to shapefile for GIS-visualization using C# and Python (Shapely and Geopandas libraries).
+
+![](./samples/example.gif)
 
 ## Aknowledgements and third-party dependencies
 
