@@ -1,0 +1,183 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"},{"aliases":[],"languageName":"python","name":"pythonkernel"}]}}
+
+#!csharp
+
+#r "nuget:Jowsy.DotNet.Interactive.Extensions,*-*"
+
+#i "C:\git\bim-net-interactive\src\Jowsy.DotNet.Interactive.Extensions\bin\Debug"
+
+#!csharp
+
+#!connect revit --kernel-name revit24 --revit-version 2024
+
+#!csharp
+
+#r "nuget:Revit.RevitApi.x64, 2023.0.0"
+#r "nuget:Revit.RevitApiUi.x64, 2023.0.0"
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+
+#!csharp
+
+#!revit24
+ProjectLocation projectLocation = doc.ActiveProjectLocation;
+
+// Get the transformation that represents the survey point's location and orientation
+Transform surveyPointTransform = projectLocation.GetTotalTransform();
+
+// Use the inverse of the survey point transform to convert the point from internal to survey coordinates
+Transform internalToSurveyTransform = surveyPointTransform.Inverse;
+
+internalToSurveyTransform
+
+#!csharp
+
+#!revit24
+var bottomFloorId = uidoc.Selection.GetElementIds().FirstOrDefault();
+
+bottomFloorId
+
+#!csharp
+
+#!revit24
+
+Floor floor = doc.GetElement(bottomFloorId) as Floor;
+
+GeometryElement geometry = floor.get_Geometry(new Options());
+
+Solid slabSolid = null;
+foreach(var g in geometry){
+
+    Solid solid = g as Solid;
+
+    display(solid);
+    if (solid != null){
+        slabSolid = solid;
+    }
+
+}
+slabSolid
+
+#!markdown
+
+Pick the lowest horizontal PlanarFace of the solids Faces
+
+#!csharp
+
+#!revit24
+
+PlanarFace lowest = null;
+    FaceArray faces = slabSolid.Faces;
+    foreach( Face f in faces )
+    {
+      PlanarFace pf = f as PlanarFace;
+      if( null != pf && (pf.FaceNormal.Z==1.0 || pf.FaceNormal.Z==-1.0))
+      {
+        if( ( null == lowest )
+          || ( pf.Origin.Z < lowest.Origin.Z ) )
+        {
+          lowest = pf;
+        }
+      }
+    }
+lowest
+
+#!markdown
+
+Tesselate eges and create polygons.
+
+#!csharp
+
+#!revit24
+List<List<XYZ>> polygons = new List<List<XYZ>>();
+EdgeArrayArray loops = lowest.EdgeLoops;
+        foreach (EdgeArray loop in loops)
+        {
+            // Select many flattens the list of lists of points into a single list of points
+            List<XYZ> vertices = loop.Cast<Edge>()
+                .SelectMany(e => e.Tessellate(), (e, point) => internalToSurveyTransform.OfPoint(point) )
+                .ToList();
+
+            // Remove last point if it's a duplicate of the first (closed loop assumption)
+            if (vertices.First().IsAlmostEqualTo(vertices.Last()))
+            {
+                vertices.RemoveAt(vertices.Count - 1);
+            }
+
+            polygons.Add(vertices);
+        }
+polygons
+
+#!markdown
+
+NET Interactive has a Jupyter integration. NOTE: Jupyter needs to be installed.
+
+#!csharp
+
+#!connect jupyter --kernel-name pythonkernel --kernel-spec python3
+
+#!pythonkernel
+
+#!set --value @revit24:polygons --name polygons
+
+#!pythonkernel
+
+import shapely
+from shapely.geometry import Point, Polygon, LineString, GeometryCollection
+import numpy as np
+
+#!markdown
+
+Use shapely to pick the largest polygon and apply convex hull.
+
+#!pythonkernel
+
+from shapely.ops import unary_union
+
+coords = list(map(lambda p: list(map(lambda pt: (pt["X"],pt["Y"]),p) ),polygons))
+_polygons = list(map(lambda coords: Polygon(coords),coords))
+_sorted = sorted(_polygons, key=lambda p: p.area, reverse=True)
+footprint = _sorted[0].convex_hull
+
+footprint
+
+#!markdown
+
+Write to shape!
+
+Since geopandas takes advantage of Shapely geometric objects, it is possible to create a Shapefile from a scratch by passing Shapely’s geometric objects into the GeoDataFrame.
+
+See https://automating-gis-processes.github.io/CSC/notebooks/L2/geopandas-basics.html
+
+#!pythonkernel
+
+import geopandas as gpd
+from shapely.geometry import Point, Polygon
+from fiona.crs import from_epsg
+
+# Create an empty geopandas GeoDataFrame
+newdata = gpd.GeoDataFrame()
+
+# Insert the polygon into 'geometry' -column at index 0
+newdata.loc[0, 'geometry'] = footprint
+
+# Set the GeoDataFrame's coordinate system to WGS84 (i.e. epsg code 4326)
+# https://spatialreference.org/ref/epsg/2272/
+newdata.crs = from_epsg(2272)
+
+
+# Determine the output path for the Shapefile
+outfp = "temp_data/footprint.shp"
+
+# Write the data into that Shapefile
+newdata.to_file(outfp)
+
+#!pythonkernel
+
+pip install geopandas
+
+#!pythonkernel
+
+pip install shapely

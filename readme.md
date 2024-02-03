@@ -5,10 +5,7 @@ A simple way to document and demonstrate automations or simply experiment with c
 
 The solution constists of an extension to VS Code Polyglot Notebooks and an addin to Revit that acts as a data environment where variables are stored in memory during a session.
 
-![](./samples/screenshot.png)
-
-
-Supported languages:
+**Supported languages:**
 - [x] C# (the scripting dialect, see [C# Scripting](https://learn.microsoft.com/en-us/archive/msdn-magazine/2016/january/essential-net-csharp-scripting))
 - [ ] F#
 - [ ] Python
@@ -27,6 +24,10 @@ Supported languages:
 3. Open /src/GetStarted.ipynb and take it from there.
 
 > 💥 **There is a third-party dll conflict between NET interactive and Autodesk BIM 360 Issues addin. In order to get the full experience you have to temporarily disable the BIM 360 Issues addin. Variable sharing will not work when the addin is enabled.**
+
+## Examples
+
+![](./samples/example2.gif)
 
 ## Aknowledgements and third-party dependencies
 
