@@ -15,6 +15,7 @@ namespace Jowsy.DotNet.Interactive.Extensions
 {
     public class ConnectRevitKernelCommand : ConnectKernelCommand
     {
+        public static string? RevitVersion;
         public Option<string> RevitVersionOption { get; } =
     new("--revit-version", "version of revit to connect to")
     {
@@ -32,6 +33,7 @@ namespace Jowsy.DotNet.Interactive.Extensions
 
             var pipeName = $"revit-kernel-{revitversion}-pipe";
 
+        
 
             var connector = new NamedPipeKernelConnector(pipeName!);
 
@@ -45,23 +47,21 @@ namespace Jowsy.DotNet.Interactive.Extensions
                 var submitCommand = command as SubmitCode;
                 if (submitCommand != null)
                 {
-                    RoslynCompilerService compilerService = new RoslynCompilerService();
-
-                    
+                    RoslynCompilerService compilerService = new RoslynCompilerService(revitversion);
 
                     var results = await compilerService.CompileRevitAddin(submitCommand.Code, 
                                                                         true, 
                                                                         async () =>
                                                                         {
-                                                                        var result = await proxyKernel.SendAsync(new RequestValueInfos());
+                                                                            var result = await proxyKernel.SendAsync(new RequestValueInfos());
 
-                                                                        var valueInfosProduced = result.Events.Where(e => e is ValueInfosProduced)
-                                                                                                        .FirstOrDefault() as ValueInfosProduced;
-                                                                        if (valueInfosProduced == null)
-                                                                        {
-                                                                            return null;
-                                                                        }
-                                                                        return valueInfosProduced.ValueInfos.ToArray();
+                                                                            var valueInfosProduced = result.Events.Where(e => e is ValueInfosProduced)
+                                                                                                            .FirstOrDefault() as ValueInfosProduced;
+                                                                            if (valueInfosProduced == null)
+                                                                            {
+                                                                                return null;
+                                                                            }
+                                                                            return valueInfosProduced.ValueInfos.ToArray();
                   
                                                                         });
 

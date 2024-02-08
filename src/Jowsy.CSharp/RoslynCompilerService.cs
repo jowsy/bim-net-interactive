@@ -16,34 +16,44 @@ using Microsoft.DotNet.Interactive.Connection;
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.Events;
 
-//Influenced by https://github.com/RickStrahl/Westwind.Scripting/blob/master/Westwind.Scripting/CSharpScriptExecution.cs#L1254
+//See https://github.com/RickStrahl/Westwind.Scripting/blob/master/Westwind.Scripting/CSharpScriptExecution.cs#L1254
 namespace Jowsy.CSharp
 {
     public class RoslynCompilerService
     {
+
         public ReferenceList References { get; private set; }
         public string GeneratedClassCode { get; private set; }
 
-        public RoslynCompilerService()
+        public RoslynCompilerService(string? revitVersion)
         {
+            if (revitVersion == null)
+            {
+                throw new ArgumentNullException(nameof(revitVersion));
+            }
+
             References = new ReferenceList();
-            AddNetFrameworkDefaultReferences();
+            AddNetFrameworkDefaultReferences(revitVersion);
+
+            string appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+            string addinPath = Path.Combine(appDataFolder, "Autodesk", "Revit", "Addins", revitVersion, "Jowsy.Revit.KernelAddin");
+            AddAssembly(Path.Combine(addinPath, "Jowsy.Revit.KernelAddin.dll"));
+            AddAssembly(Path.Combine(addinPath, "System.Text.Json.dll"));  
         }
-        public void AddNetFrameworkDefaultReferences()
+        public void AddNetFrameworkDefaultReferences(string revitVersion)
         {
             AddAssembly("mscorlib.dll");
             AddAssembly("System.dll");
             AddAssembly("System.Core.dll");
-            //AddAssembly("System.Private.CoreLib.dll");
             AddAssembly("Microsoft.CSharp.dll");
             AddAssembly("System.Net.Http.dll");
-            //AddAssembly(typeof(object).GetTypeInfo().Assembly.FullName);
-            AddAssembly("C:\\git\\bim-net-interactive\\src\\Jowsy.Revit.KernelAddin\\bin\\Debug R24\\Jowsy.Revit.KernelAddin.dll");
-            AddAssembly("C:\\Program Files\\Autodesk\\Revit 2024\\RevitAPI.dll");
-            AddAssembly("C:\\Program Files\\Autodesk\\Revit 2024\\RevitAPIUI.dll");
-            AddAssembly("C:\\Program Files\\Autodesk\\Revit 2024\\RevitAPIIFC.dll");
-           
-            AddAssembly(typeof(ReferenceList)); // Scripting Library
+            AddAssembly($"C:\\Program Files\\Autodesk\\Revit {revitVersion}\\RevitAPI.dll");
+            AddAssembly($"C:\\Program Files\\Autodesk\\Revit {revitVersion}\\RevitAPIUI.dll");
+            AddAssembly($"C:\\Program Files\\Autodesk\\Revit {revitVersion}\\RevitAPIIFC.dll");
+            AddAssembly($"C:\\Program Files\\Autodesk\\Revit {revitVersion}\\NewtonSoft.Json.dll");
+
+            AddAssembly(typeof(ReferenceList));
         }
         public bool AddAssembly(string assemblyDll)
         {
@@ -54,7 +64,7 @@ namespace Jowsy.CSharp
             if (!File.Exists(file))
             {
                 // check framework or dedicated runtime app folder
-                var path = "C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8\\";//Path.GetDirectoryName(typeof(object).Assembly.Location);
+                var path = "C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8\\";
                 file = Path.Combine(path, assemblyDll);
                 if (!File.Exists(file))
                     return false;
@@ -157,13 +167,7 @@ namespace Jowsy.CSharp
             using (codeStream)
             {
                 EmitResult compilationResult = null;
-                /*if (CompileWithDebug)
-                {
-                    var debugOptions = CompileWithDebug ? DebugInformationFormat.Embedded : DebugInformationFormat.Pdb;
-                    compilationResult = compilation.Emit(codeStream,
-                        options: new EmitOptions(debugInformationFormat: debugOptions));
-                }
-                else*/
+
                 compilationResult = compilation.Emit(codeStream);
 
      
@@ -183,18 +187,16 @@ namespace Jowsy.CSharp
                             DiagnosticText = sb.ToString(),
                             Success = false
                         };
-                        //   context.DisplayStandardError(sb.ToString());
+
                     }
-                    //ErrorType = ExecutionErrorTypes.Compilation;
-                    //ErrorMessage = sb.ToString();
+
                     if (!toAssemblyFile)
                     {
                         var memStream = (MemoryStream)codeStream;
                         memStream.Seek(0, SeekOrigin.Begin);
                         assembly = Assembly.Load(memStream.ToArray());
                     }
-                    // no exception here during compilation - return the error
-                    //SetErrors(new ApplicationException(ErrorMessage), true);
+
                     return new CompilationResults()
                     {
                         Success = false,

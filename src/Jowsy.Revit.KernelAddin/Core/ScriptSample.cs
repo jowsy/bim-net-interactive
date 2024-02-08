@@ -33,8 +33,6 @@ namespace Jowsy.Revit.KernelAddin.Core
             Transaction transaction = new Transaction(doc, "Export IFC");
             transaction.Start("start");
 
-
-
             // Use the Export method of the Document class
             doc.Export("c:\\Temp\\", "export2.ifc", ifcExportOptions);
 
