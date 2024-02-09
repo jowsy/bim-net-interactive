@@ -38,6 +38,26 @@ Extracting profile geometry from floor and export to shapefile for GIS-visualiza
 
 ![](./samples/example.gif)
 
+## Limitations
+
+The Revit API is tightly coupled with the Revit UI and the Revit document data structures and operates on the assumption that it's being called within the same process where the UI and the document are loaded.
+This prevents you from calling the API from for example a polyglot notebook without some kind of middle-man or dispatcher.
+
+## Current solution
+NET interactive operates with kernels. A *kernel* is simply a process that receives execution instructions from clients and communicates the results back to them. The decopuled two-process model where you separate execution from evaluation allows for an approach where an evaluator can live inside Autodesk Revit as an addin and receives code from frontend clients such as Polyglot Notebook, Azure Data Studio or Jupyter.
+
+In .NET Interactive a *proxy kernel* is a concept that describes a subkernel that proxies a remote kernel. We can add a proxy kernel to the composite kernel that routes commands to the actual implementation written as a Revit Addin. The revit addin implements a NET Interactive kernel process and executes code in the Revit API thread using external events(check Jeremy Tammik's arcticle [External Access to the Revit API](https://thebuildingcoder.typepad.com/blog/2017/05/external-access-to-the-revit-api.html) for more info on this topic). 
+
+However, due to the issues with third-party conflicts regarding the Roslyn API:s it was a hurdle to compile the code in the Revit addin so I tested to move the compilation before the code is sent to the embedded kernel in Revit. Technically, it is done using a registered middleware on the proxykernel that compiles the code and then send the path to the compiled assembly to the revit addin which loads it into memory and executes a method defined in a common interface with a list of common variables.
+
+## Resources
+
+* [IPython](https://ipython.org/ipython-doc/stable/overview.html#ipythonzmq)
+* [NET Interactive](https://github.com/dotnet/interactive)
+* [Literate Programming with LLMs](https://matt-rickard.com/literate-programming-with-llms)
+
+
+
 ## Aknowledgements and third-party dependencies
 
 * Built on top of [NET Interactive](https://github.com/dotnet/interactive)
