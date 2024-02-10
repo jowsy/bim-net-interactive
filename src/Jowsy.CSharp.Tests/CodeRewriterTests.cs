@@ -97,8 +97,7 @@ namespace Jowsy.CSharp.Tests
             var valueInfos = new List<KernelValueInfo>(){
                                     new KernelValueInfo("numbers",
                                                         new Microsoft.DotNet.Interactive.FormattedValue("text","List"),
-                                                        null,
-                                                        (typeof(List<Int32>)).Name)
+                                                        typeof(List<Int32>))
                                 };
 
 
@@ -135,7 +134,7 @@ namespace Jowsy.CSharp.Tests
         [Fact]
         public async Task TryCompile()
         {
-                RoslynCompilerService service = new RoslynCompilerService();
+                RoslynCompilerService service = new RoslynCompilerService("2024");
 
             var results = await service.CompileRevitAddin("height = 5;", false, () =>
             {
