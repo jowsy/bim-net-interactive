@@ -4,21 +4,26 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<Version>0.1.15</Version>
+	<Version>0.1.0</Version>
 	<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
 	<PropertyGroup>
 		<IsPackable>true</IsPackable>
 		<PackageDescription>$(Description)</PackageDescription>
-		<PackageTags>dotnet-interactive</PackageTags>
+		<PackageId>RevitInteractive</PackageId>
+		<PackageTags>autodesk revit;dotnet-interactive</PackageTags>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<PackageVersion>$(version)-alpha</PackageVersion>
+		<PackageVersion>$(version)</PackageVersion>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Authors>Joel Waldheim Saury</Authors>
+		<RepositoryUrl>https://github.com/jowsy/bim-net-interactive/</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="$(OutputPath)/$(AssemblyName).dll" Pack="true" PackagePath="interactive-extensions/dotnet" />
+		<None Include="docs\README.md" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -26,7 +31,10 @@
 		<PackageReference Include="microsoft.dotnet.interactive.csharp" Version="1.0.0-beta.23611.1" />
 		<PackageReference Include="microsoft.dotnet.interactive.formatting" Version="1.0.0-beta.23611.1" />
 	</ItemGroup>
-
+	
+	<PropertyGroup>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Jowsy.CSharp\Jowsy.CSharp.csproj">
 			<ReferenceOutputAssembly>true</ReferenceOutputAssembly>

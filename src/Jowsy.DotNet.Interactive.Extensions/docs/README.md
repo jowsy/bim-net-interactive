@@ -1,0 +1,1 @@
+This project explores the possibility to run live Revit C#-scripts inside notebooks bundled with visualizations and narrative text. 
