@@ -13,6 +13,8 @@ namespace Jowsy.Revit.KernelAddin.UI
     {
         public RelayCommand StartCommand { get; }
         public RelayCommand RestartCommand { get; }
+        public RelayCommand SettingsCommand { get; }
+
         private const string NamedPipeName = "revit-kernel-2024-pipe";
         private readonly UIApplication _uiApp;
         private ObservableCollection<CommandViewItem> _kernelCommands = new ObservableCollection<CommandViewItem>();
@@ -71,7 +73,14 @@ namespace Jowsy.Revit.KernelAddin.UI
                 DisposeKernel();
                 await InitKernel();
             });
-    
+
+            SettingsCommand = new RelayCommand((c) =>
+            {
+                var settingsWindow = new SettingsWindow();
+                settingsWindow.ShowDialog();
+            });
+
+
         }
         public void DisposeKernel()
         {
@@ -125,6 +134,7 @@ namespace Jowsy.Revit.KernelAddin.UI
                                                                                   .Select(v => new VariableViewItem()
                                                                                   {
                                                                                       Name = v.Key,
+                                                                                      Type = v.Value?.GetType().Name,
                                                                                       Value = v.Value?.ToString()
                                                                                   }));
         }

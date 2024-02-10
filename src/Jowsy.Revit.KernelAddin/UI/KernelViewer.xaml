@@ -11,31 +11,30 @@
     <Page.Resources>
         <ResourceDictionary>
             <local:EnumToStringConverter x:Key="EnumToStringConverter"/>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/RetroUI;component/Themes/Generic.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="30"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" VerticalAlignment="Center" Padding="1" Margin="2" Command="{Binding StartCommand}" IsEnabled="{Binding StartButtonEnabled, UpdateSourceTrigger=PropertyChanged}">Start
             </Button>
             <Button Grid.Column="1" VerticalAlignment="Center" Padding="1"  Margin="2" Command="{Binding RestartCommand}">Restart</Button>
-            <TextBlock Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding KernelStatus, Converter={StaticResource EnumToStringConverter}, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,0,0"/>
-            <Canvas Grid.Column="2" Height="25" Width="25">
+          
+            <Button Grid.Column="3" VerticalAlignment="Center" Padding="1"  Margin="2" Command="{Binding SettingsCommand}">Settings</Button>
+            <Canvas Grid.Column="2" Height="25" Width="25" HorizontalAlignment="Left">
                 <Ellipse
-                Width="25"
-                Height="25"
+                Width="20"
+                Height="20"
                 Stroke="Black"
                 StrokeThickness="2">
                     <Ellipse.Style>
@@ -77,5 +76,6 @@
 
             </TabItem>
         </TabControl>
+        <TextBlock Grid.Row="3" VerticalAlignment="Center" FontWeight="Bold" HorizontalAlignment="Left" Text="{Binding KernelStatus, Converter={StaticResource EnumToStringConverter}, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,0,0"/>
     </Grid>
 </Page>

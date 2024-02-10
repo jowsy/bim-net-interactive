@@ -1,0 +1,29 @@
+﻿<Window x:Class="Jowsy.Revit.KernelAddin.UI.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Jowsy.Revit.KernelAddin.UI"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="ToolWindow"
+        mc:Ignorable="d"
+        Title="Kernel Settings" Height="225" Width="367">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <StackPanel Margin="5">
+            <TextBlock Text="Formatting settings" FontWeight="Bold"  VerticalAlignment="Center"/>
+            <StackPanel Margin="5">
+                <TextBlock Text="Set the recursion limit." VerticalAlignment="Center"/>
+                <TextBox Name="txtRecursionLimit" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100"></TextBox>
+            </StackPanel>
+            
+        </StackPanel>
+        <DockPanel Grid.Row="1" HorizontalAlignment="Right" Margin="5">
+            <Button HorizontalAlignment="Right" Width="50" VerticalAlignment="Center" Margin="0,0,5,0" Click="Button_Click">OK</Button>
+            <Button HorizontalAlignment="Right" Width="50" VerticalAlignment="Center" Click="Button_Click_1">Cancel</Button>
+        </DockPanel>
+    </Grid>
+</Window>
