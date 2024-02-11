@@ -1,14 +1,24 @@
-# Revit API Notebooks
+# BIM Interactive Notebooks
 
 This is a personal project that explores the possibility to run live Revit C#-scripts inside notebooks bundled with visualizations and narrative text. 
 
-Install the Revit kernel extension in VSCode Polyglot Notebook using the #r directive.
+This has resulted in different parts:
+1. A Revit Addin (Technically a implementation of a NET interactive kernel)
+2. Visual Studio Code Polyglot Notebooks extension
+3. A collection of showcase notebooks (see /samples/) (IN PROGRESS)
 
+## Revit addin
+There is a quite stable version of the addin. I am working on an installer.
+
+## Extension to VS Code Polyglot Notebook
+The idea is to run scripts with [Polyglot Notebook Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.dotnet-interactive-vscode), an extension to Visual Studio Code, a free code editor.
+
+In Visual Studio Code, open a new notebook and create a code cell to enable the revit interaction using the #r directive.
 ```csharp
-#r "nuget:Jowsy.DotNet.Interactive.Extensions"
+#r "nuget:RevitInteractive"
 ```
 
-Then connect at runtime to a running Revit application using #connect-directive. Specify Revit-version.
+Use the #connect-directive to establish live connection to revit. This requires an addin.
 ```csharp
 #!connect revit --kernel-name revit24 --revit-version 2024
 ```
@@ -36,6 +46,8 @@ result
 
 Extracting profile geometry from floor and export to shapefile for GIS-visualization using C# and Python (Shapely and Geopandas libraries).
 
+See /samples/ directory for more examples.
+
 ![](./samples/example.gif)
 
 ## Limitations
@@ -55,6 +67,7 @@ However, due to the issues with third-party conflicts regarding the Roslyn API:s
 * [IPython](https://ipython.org/ipython-doc/stable/overview.html#ipythonzmq)
 * [NET Interactive](https://github.com/dotnet/interactive)
 * [Literate Programming with LLMs](https://matt-rickard.com/literate-programming-with-llms)
+* [Jupyter BIM](https://github.com/chuongmep/JupyterBIM)
 
 
 
