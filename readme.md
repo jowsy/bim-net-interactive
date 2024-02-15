@@ -44,9 +44,9 @@ result
 ```
 ## Examples
 
-Extracting profile geometry from floor and export to shapefile for GIS-visualization using C# and Python (Shapely and Geopandas libraries).
+Extracting profile geometry from floor and export to shapefile for GIS-visualization using C# and Python (with Shapely and Geopandas).
 
-See /samples/ directory for more examples.
+See [samples/GIS/GIS Visualization Building Footprint.ipynb](https://github.com/jowsy/bim-net-interactive/blob/main/samples/GIS/GIS%20Visualization%20Building%20Footprint.ipynb)
 
 ![](./samples/example.gif)
 
