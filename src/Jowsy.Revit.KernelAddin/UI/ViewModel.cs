@@ -15,12 +15,10 @@ namespace Jowsy.Revit.KernelAddin.UI
         public RelayCommand RestartCommand { get; }
         public RelayCommand SettingsCommand { get; }
 
-        private const string NamedPipeName = "revit-kernel-2024-pipe";
-        private readonly UIApplication _uiApp;
+        private readonly string _revitVersion;
         private ObservableCollection<CommandViewItem> _kernelCommands = new ObservableCollection<CommandViewItem>();
         private Variables _variablesStore;
         private CompositeKernel _kernel;
-
         private KernelStatus _kernelStatus;
 
         public KernelStatus KernelStatus
@@ -55,10 +53,12 @@ namespace Jowsy.Revit.KernelAddin.UI
             }
         }
 
+        public string NamedPipeName { get => $"revit-kernel-{_revitVersion}-pipe"; }
 
-        public ViewModel()
+        public ViewModel(string revitVersion)
         {
-            
+            this._revitVersion = revitVersion ?? throw new ArgumentNullException(nameof(revitVersion));
+
             _variablesStore = new Variables();
             _variablesStore.VariablesChanged += _variablesStore_VariablesChanged;
 
@@ -80,7 +80,6 @@ namespace Jowsy.Revit.KernelAddin.UI
                 settingsWindow.ShowDialog();
             });
 
-
         }
         public void DisposeKernel()
         {
@@ -95,17 +94,11 @@ namespace Jowsy.Revit.KernelAddin.UI
 
         public async Task InitKernel()
         {
-
             _kernel = new CompositeKernel();
-
-            var str = Microsoft.DotNet.Interactive.Formatting.Formatter.DefaultMimeType;
-
             _kernel.KernelEvents.ObserveOn(SynchronizationContext.Current).Subscribe(new KernelObserver(this), new CancellationToken());
 
             var revitKernel = new RevitKernel("RevitKernel", _variablesStore);
-
             _kernel.Add(revitKernel);
-
             revitKernel.UseValueSharing();
 
             SetUpNamedPipeKernelConnection();
@@ -122,7 +115,7 @@ namespace Jowsy.Revit.KernelAddin.UI
             await App.KernelInitEventHandler.Tcs.Task;
 
             var uiApp = App.KernelInitEventHandler.UIApplication;
-             _variablesStore.Add("uiapp", uiApp);
+            _variablesStore.Add("uiapp", uiApp);
             _variablesStore.Add("uidoc", uiApp.ActiveUIDocument);
             _variablesStore.Add("doc", uiApp.ActiveUIDocument.Document);
 
@@ -156,7 +149,7 @@ namespace Jowsy.Revit.KernelAddin.UI
                 new Uri("kernel://remote-control"));
             var receiver = KernelCommandAndEventReceiver.FromNamedPipe(serverStream);
 
-            var host = _kernel.UseHost(sender, receiver, new Uri("kernel://revit-kernel-2024"));
+            var host = _kernel.UseHost(sender, receiver, new Uri($"kernel://revit-kernel-{_revitVersion}"));
 
             _kernel.RegisterForDisposal(host);
             _kernel.RegisterForDisposal(receiver);

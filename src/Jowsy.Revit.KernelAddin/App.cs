@@ -38,9 +38,11 @@ namespace Jowsy.Revit.KernelAddin
             KernelInitEventHandler = new KernelInitEventHandler();
             InitKernelEvent = ExternalEvent.Create(KernelInitEventHandler);
 
-            var kernelPaneProvider = new KernelDockablePaneProvider(new ViewModel());
+            var kernelPaneProvider = new KernelDockablePaneProvider(new ViewModel(application.ControlledApplication.VersionNumber));
+
             application.RegisterDockablePane(DockablePaneId, "NETInteractive Revit Kernel", kernelPaneProvider);
 
+            //TODO: Implement a better formatter! Maybe based on RevitLookup?
            Formatter.SetPreferredMimeTypesFor(typeof(Element), "text/html");
 
             //It's common for object graphs to contain reference cycles.

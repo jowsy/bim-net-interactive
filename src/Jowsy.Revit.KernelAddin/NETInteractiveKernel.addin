@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
 	<AddIn Type="Application">
-		<Name>Embedded NET Interactive Kernel</Name>
+		<Name>NET Interactive Kernel for Revit</Name>
 		<Assembly>Jowsy.Revit.KernelAddin\Jowsy.Revit.KernelAddin.dll</Assembly>
 		<AddInId>3E9B3B59-7931-4FDD-B4C1-204E5726D6A6</AddInId>
 		<FullClassName>Jowsy.Revit.KernelAddin.App</FullClassName>
