@@ -10,6 +10,12 @@ This has resulted in different parts:
 ## Revit addin
 There is a quite stable version of the addin. I am working on an installer.
 
+## System Prompting LLM
+When using CHAT-GPT to write revit API Code for use in the notebook you would probably want to steer it's behaviour to minimize editing the code for use in an interactive context.
+See [System Promts](https://github.com/jowsy/bim-net-interactive/tree/main/samples/system-prompts/) folder for examples.
+Begin conversation by:
+    [SYSTEM] You are a Revit API tutor...
+
 ## Extension to VS Code Polyglot Notebook
 The idea is to run scripts with [Polyglot Notebook Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.dotnet-interactive-vscode), an extension to Visual Studio Code, a free code editor.
 
@@ -68,6 +74,7 @@ However, due to the issues with third-party conflicts regarding the Roslyn API:s
 * [NET Interactive](https://github.com/dotnet/interactive)
 * [Literate Programming with LLMs](https://matt-rickard.com/literate-programming-with-llms)
 * [Jupyter BIM](https://github.com/chuongmep/JupyterBIM)
+* [ChatGPT System Prompts](https://github.com/mustvlad/ChatGPT-System-Prompts/tree/main)
 
 
 
