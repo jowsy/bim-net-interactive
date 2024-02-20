@@ -42,8 +42,11 @@ namespace Jowsy.Revit.KernelAddin
 
             application.RegisterDockablePane(DockablePaneId, "NETInteractive Revit Kernel", kernelPaneProvider);
 
+            //Force loading of assembly
+            var activityType = typeof(System.Diagnostics.Activity); 
+
             //TODO: Implement a better formatter! Maybe based on RevitLookup?
-           Formatter.SetPreferredMimeTypesFor(typeof(Element), "text/html");
+            Formatter.SetPreferredMimeTypesFor(typeof(Element), "text/html");
 
             //It's common for object graphs to contain reference cycles.
             //The .NET Interactive formatter will traverse object graphs but in order to avoid both oversized outputs and possible

@@ -57,6 +57,7 @@
         <ItemGroup>
             <AddinFiles Include="$(RootDir)**\Jowsy.Revit.KernelAddin.dll"/>
             <AddinFiles Include="$(RootDir)**\System.Text.Json.dll"/>
+            <AddinFiles Include="$(RootDir)**\System.Diagnostics.DiagnosticSource.dll"/>
         </ItemGroup>
         <Message Text="Copy files to Addin folder" Importance="high"/>
         <Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))"/>
