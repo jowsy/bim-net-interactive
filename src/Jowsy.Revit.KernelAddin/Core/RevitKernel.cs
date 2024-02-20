@@ -83,9 +83,6 @@ namespace Jowsy.Revit.KernelAddin.Core
 
         public Task HandleAsync(RequestValueInfos command, KernelInvocationContext context)
         {
-            var assLocation = typeof(Microsoft.DotNet.Interactive.Formatting.PocketView).Assembly.Location;
-            var assName = typeof(Microsoft.DotNet.Interactive.Formatting.PocketView).Assembly.GetName().Name;
-
             var valueInfos = _variablesStore.GetVariables()
                                             .Select(v => 
                                                     new KernelValueInfo(v.Key,                         
