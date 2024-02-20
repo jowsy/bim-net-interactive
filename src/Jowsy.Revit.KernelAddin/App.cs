@@ -53,25 +53,13 @@ namespace Jowsy.Revit.KernelAddin
         }
         Assembly CurrentDomain_AssemblyResolve(object sender,ResolveEventArgs args)
         {
-            try
+            // load the assembly from the embedded resources
+            string folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            // get all ass in folder and load
+            IEnumerable<string> dirs = Directory.EnumerateFiles(folder, "*.dll");
+            foreach (string dir in dirs)
             {
-                if (args.Name.Contains("Encodings") || args.Name.Contains("Retro") || args.Name.Contains("GridExtensions"))
-                {
-                    string filename = Path.GetDirectoryName(typeof(ViewModel).Assembly.Location);
-
-                    filename = Path.Combine(filename,
-                      args.Name.Split(',').FirstOrDefault() + ".dll");
-
-                    if (File.Exists(filename))
-                    {
-                        return Assembly
-                          .LoadFrom(filename);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-
+                Assembly.LoadFrom(dir);
             }
             return null;
         }

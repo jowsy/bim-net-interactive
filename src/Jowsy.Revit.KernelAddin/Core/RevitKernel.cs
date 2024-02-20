@@ -83,6 +83,9 @@ namespace Jowsy.Revit.KernelAddin.Core
 
         public Task HandleAsync(RequestValueInfos command, KernelInvocationContext context)
         {
+            var assLocation = typeof(Microsoft.DotNet.Interactive.Formatting.PocketView).Assembly.Location;
+            var assName = typeof(Microsoft.DotNet.Interactive.Formatting.PocketView).Assembly.GetName().Name;
+
             var valueInfos = _variablesStore.GetVariables()
                                             .Select(v => 
                                                     new KernelValueInfo(v.Key,                         
@@ -101,7 +104,6 @@ namespace Jowsy.Revit.KernelAddin.Core
             {
                 mimeType = Formatter.GetPreferredMimeTypesFor(value?.GetType()).First();
             }
-
             return new FormattedValue(mimeType, value.ToDisplayString(mimeType));
         }
 

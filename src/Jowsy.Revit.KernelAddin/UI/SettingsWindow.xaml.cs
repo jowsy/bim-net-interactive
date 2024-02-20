@@ -25,6 +25,7 @@ namespace Jowsy.Revit.KernelAddin.UI
             InitializeComponent();
 
             //TODO: Use MVVM-pattern
+
             //This is not how WPF should be used but it is quick :)
             txtRecursionLimit.Text = Formatter.RecursionLimit.ToString();
         }

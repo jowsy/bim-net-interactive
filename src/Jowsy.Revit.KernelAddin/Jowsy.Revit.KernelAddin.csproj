@@ -1,61 +1,67 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <UseWPF>true</UseWPF>
-    <LangVersion>10.0</LangVersion>
-    <PlatformTarget>x64</PlatformTarget>
-    <ImplicitUsings>true</ImplicitUsings>
-    <UseWindowsForms>false</UseWindowsForms>
-    <TargetFramework>net48</TargetFramework>
-    <Configurations>Debug R22;Debug R23;Debug R24</Configurations>
-    <Configurations>$(Configurations);Release R22;Release R23;Release R24</Configurations>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.Contains('R24'))">
-    <RevitVersion>2024</RevitVersion>
-    <DefineConstants>$(DefineConstants);R24</DefineConstants>
-  </PropertyGroup>
-	<PropertyGroup Condition="$(Configuration.Contains('R23'))">
-		<RevitVersion>2023</RevitVersion>
-		<DefineConstants>$(DefineConstants);R23</DefineConstants>
-	</PropertyGroup>
-  <PropertyGroup>
-    <Version>$(RevitVersion)</Version>
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Description></Description>
-    <PublishSingleFile>true</PublishSingleFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="DataGridExtensions" Version="2.6.0" />
-    <PackageReference Include="Microsoft.DotNet.Interactive" Version="1.0.0-beta.24054.2" />
-    <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2024.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="RetroUI">
-      <HintPath>..\..\lib\RetroUI.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-	<Target Name="CopyFiles" AfterTargets="CoreBuild">
-		<ItemGroup>
-			<RootItem Include="$(ProjectDir)*.addin" />
-			<AddinItem Include="$(TargetDir)*.dll" />
-			<AddinItem Include="$(TargetDir)*.pdb" />
-		</ItemGroup>
+    <PropertyGroup>
+        <UseWPF>true</UseWPF>
+        <LangVersion>10.0</LangVersion>
+        <PlatformTarget>x64</PlatformTarget>
+        <ImplicitUsings>true</ImplicitUsings>
+        <UseWindowsForms>false</UseWindowsForms>
+        <TargetFramework>net48</TargetFramework>
+        <Configurations>Debug R22;Debug R23;Debug R24</Configurations>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <Configurations>$(Configurations);Release R22;Release R23;Release R24</Configurations>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R24'))">
+        <RevitVersion>2024</RevitVersion>
+        <DefineConstants>$(DefineConstants);R24</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R23'))">
+        <RevitVersion>2023</RevitVersion>
+        <DefineConstants>$(DefineConstants);R23</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup>
+        <Version>$(RevitVersion)</Version>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <Description></Description>
+        <PublishSingleFile>true</PublishSingleFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="DataGridExtensions" Version="2.6.0"/>
+        <PackageReference Include="dnMerge" Version="0.5.15">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.DotNet.Interactive" Version="1.0.0-beta.24054.2"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2024.0.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="RetroUI">
+            <HintPath>..\..\lib\RetroUI.dll</HintPath>
+            <Private>True</Private>
+        </Reference>
+    </ItemGroup>
+    <Target Name="CopyFiles" AfterTargets="CoreBuild">
+        <ItemGroup>
+            <RootItem Include="$(ProjectDir)*.addin"/>
+            <AddinItem Include="$(TargetDir)*.dll"/>
+            <AddinItem Include="$(TargetDir)*.pdb"/>
+        </ItemGroup>
 
-		<PropertyGroup>
-			<RootDir>bin\AddIn $(RevitVersion) $(Configuration)\</RootDir>
-			<AddinDir>$(RootDir)$(AssemblyName)\</AddinDir>
-		</PropertyGroup>
+        <PropertyGroup>
+            <RootDir>bin\AddIn $(RevitVersion) $(Configuration)\</RootDir>
+            <AddinDir>$(RootDir)$(AssemblyName)\</AddinDir>
+        </PropertyGroup>
 
-		<Copy SourceFiles="@(RootItem)" DestinationFolder="$(RootDir)" />
-		<Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AddinDir)" />
+        <Copy SourceFiles="@(RootItem)" DestinationFolder="$(RootDir)"/>
+        <Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AddinDir)"/>
 
-		<ItemGroup>
-			<AddinFiles Include="$(RootDir)**\*.*" />
-		</ItemGroup>
-		<Message Text="Copy files to Addin folder" Importance="high" />
-		<Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))" />
-	</Target>
+        <ItemGroup>
+            <AddinFiles Include="$(RootDir)**\*.*"/>
+        </ItemGroup>
+        <Message Text="Copy files to Addin folder" Importance="high"/>
+        <Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))"/>
+    </Target>
 
 
 </Project>
