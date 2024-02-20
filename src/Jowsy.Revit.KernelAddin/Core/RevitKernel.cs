@@ -101,7 +101,6 @@ namespace Jowsy.Revit.KernelAddin.Core
             {
                 mimeType = Formatter.GetPreferredMimeTypesFor(value?.GetType()).First();
             }
-
             return new FormattedValue(mimeType, value.ToDisplayString(mimeType));
         }
 
