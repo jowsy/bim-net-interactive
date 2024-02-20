@@ -76,7 +76,7 @@ However, due to the issues with third-party conflicts regarding the Roslyn API:s
 * [Literate Programming with LLMs](https://matt-rickard.com/literate-programming-with-llms)
 * [Jupyter BIM](https://github.com/chuongmep/JupyterBIM)
 * [ChatGPT System Prompts](https://github.com/mustvlad/ChatGPT-System-Prompts/tree/main)
-
+* [dnMerge](https://github.com/CCob/dnMerge)
 
 
 ## Aknowledgements and third-party dependencies
