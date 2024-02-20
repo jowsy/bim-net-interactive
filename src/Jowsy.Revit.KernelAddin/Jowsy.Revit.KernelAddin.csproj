@@ -7,7 +7,6 @@
         <UseWindowsForms>false</UseWindowsForms>
         <TargetFramework>net48</TargetFramework>
         <Configurations>Debug R22;Debug R23;Debug R24</Configurations>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <Configurations>$(Configurations);Release R22;Release R23;Release R24</Configurations>
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration.Contains('R24'))">
@@ -32,7 +31,6 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.DotNet.Interactive" Version="1.0.0-beta.24054.2"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2024.0.0"/>
     </ItemGroup>
     <ItemGroup>
@@ -57,7 +55,8 @@
         <Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AddinDir)"/>
 
         <ItemGroup>
-            <AddinFiles Include="$(RootDir)**\*.*"/>
+            <AddinFiles Include="$(RootDir)**\Jowsy.Revit.KernelAddin.dll"/>
+            <AddinFiles Include="$(RootDir)**\System.Text.Json.dll"/>
         </ItemGroup>
         <Message Text="Copy files to Addin folder" Importance="high"/>
         <Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))"/>

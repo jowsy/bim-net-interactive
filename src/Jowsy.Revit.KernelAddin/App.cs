@@ -55,11 +55,10 @@ namespace Jowsy.Revit.KernelAddin
         {
             // load the assembly from the embedded resources
             string folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            // get all ass in folder and load
-            IEnumerable<string> dirs = Directory.EnumerateFiles(folder, "*.dll");
-            foreach (string dir in dirs)
+            string assemblyPath = Path.Combine(folder, new AssemblyName(args.Name).Name + ".dll");
+            if (File.Exists(assemblyPath))
             {
-                Assembly.LoadFrom(dir);
+                return Assembly.LoadFrom(assemblyPath);
             }
             return null;
         }
