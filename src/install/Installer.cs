@@ -1,5 +1,5 @@
-﻿using System;
-using Installer;
+﻿using Installer;
+using System;
 using WixSharp;
 using WixSharp.CommonTasks;
 using WixSharp.Controls;
@@ -16,8 +16,8 @@ var project = new Project
     UI = WUI.WixUI_FeatureTree,
     MajorUpgrade = MajorUpgrade.Default,
     GUID = new Guid("9D22EA21-753A-4CBD-AF9E-E0D71CB9CF2D"),
-   //BannerImage = @"install\Resources\Icons\BannerImage.png",
-   // BackgroundImage = @"install\Resources\Icons\BackgroundImage.png",
+    //BannerImage = @"install\Resources\Icons\BannerImage.png",
+    // BackgroundImage = @"install\Resources\Icons\BackgroundImage.png",
     Version = Assembly.GetExecutingAssembly().GetName().Version.ClearRevision(),
     ControlPanelInfo =
     {

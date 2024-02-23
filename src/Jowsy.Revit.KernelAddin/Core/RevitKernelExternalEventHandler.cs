@@ -1,14 +1,8 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.UI;
 using Jowsy.Revit.KernelAddin.UI;
 using Microsoft.DotNet.Interactive;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jowsy.Revit.KernelAddin.Core
 {

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Jowsy.DotNet.Interactive.Extensions
+﻿namespace Jowsy.DotNet.Interactive.Extensions
 {
+    using Microsoft.DotNet.Interactive.Commands;
+    using Microsoft.DotNet.Interactive.Connection;
     using System;
     using System.IO.Pipes;
     using System.Reactive.Disposables;
     using System.Security.Principal;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.DotNet.Interactive.Commands;
-    using Microsoft.DotNet.Interactive.Connection;
 
     public class NamedPipeKernelConnector : IDisposable
     {

@@ -43,7 +43,7 @@ namespace Jowsy.Revit.KernelAddin
             application.RegisterDockablePane(DockablePaneId, "NETInteractive Revit Kernel", kernelPaneProvider);
 
             //Force loading of assembly
-            var activityType = typeof(System.Diagnostics.Activity); 
+            var activityType = typeof(System.Diagnostics.Activity);
 
             //TODO: Implement a better formatter! Maybe based on RevitLookup?
             Formatter.SetPreferredMimeTypesFor(typeof(Element), "text/html");
@@ -54,7 +54,7 @@ namespace Jowsy.Revit.KernelAddin
             Formatter.RecursionLimit = 3;
             return Result.Succeeded;
         }
-        Assembly CurrentDomain_AssemblyResolve(object sender,ResolveEventArgs args)
+        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             // load the assembly from the embedded resources
             string folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

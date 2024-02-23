@@ -1,14 +1,8 @@
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
-using Elfie.Serialization;
-using System.Diagnostics;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.DotNet.Interactive.Commands;
-using Microsoft.DotNet.Interactive.Events;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.DotNet.Interactive.ValueSharing;
-using Microsoft.DotNet.Interactive.Connection;
+using System.Diagnostics;
 
 namespace Jowsy.CSharp.Tests
 {
@@ -41,7 +35,7 @@ namespace Jowsy.CSharp.Tests
         }
     }
 }";
-           
+
             actual.Should().Be(expected);
         }
 
@@ -49,7 +43,7 @@ namespace Jowsy.CSharp.Tests
         public void UndeclaredVariablesShouldBeResolvedIfTheyExistGloballyInKernel()
         {
             var valueInfos = new List<KernelValueInfo>(){
-                                    new KernelValueInfo("message", 
+                                    new KernelValueInfo("message",
                                                         new Microsoft.DotNet.Interactive.FormattedValue("text",""),
                                                         typeof(string)),
                                     new KernelValueInfo("number",
@@ -134,7 +128,7 @@ namespace Jowsy.CSharp.Tests
         [Fact]
         public async Task TryCompile()
         {
-                RoslynCompilerService service = new RoslynCompilerService("2024");
+            RoslynCompilerService service = new RoslynCompilerService("2024");
 
             var results = await service.CompileRevitAddin("height = 5;", false, () =>
             {
@@ -149,10 +143,10 @@ namespace Jowsy.CSharp.Tests
 
 
         }
-       
+
         public static string StripUsings(string code)
         {
-            var index = code.ToLower().IndexOf("namespace");  
+            var index = code.ToLower().IndexOf("namespace");
 
             return code.Substring(index);
         }

@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.UI;
-using Jowsy.Revit.KernelAddin.Core;
 
 namespace Jowsy.Revit.KernelAddin.Core
 {
