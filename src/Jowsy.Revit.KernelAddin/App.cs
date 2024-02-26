@@ -26,10 +26,10 @@ namespace Jowsy.Revit.KernelAddin
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-            var ribbonPanel = application.CreateRibbonPanel("NET Interactive");
+            var ribbonPanel = application.CreateRibbonPanel("Interactive Revit Kernel");
 
             var showCommand = typeof(ShowCommand);
-            var showButtonData = new PushButtonData(showCommand.FullName, "Show\nDockable Pane)", Assembly.GetAssembly(showCommand).Location, showCommand.FullName);
+            var showButtonData = new PushButtonData(showCommand.FullName, "Show\nDockable Pane", Assembly.GetAssembly(showCommand).Location, showCommand.FullName);
             ribbonPanel.AddItem(showButtonData);
 
             KernelEventHandler = new RevitKernelExternalEventHandler();
@@ -40,7 +40,7 @@ namespace Jowsy.Revit.KernelAddin
 
             var kernelPaneProvider = new KernelDockablePaneProvider(new ViewModel(application.ControlledApplication.VersionNumber));
 
-            application.RegisterDockablePane(DockablePaneId, "NETInteractive Revit Kernel", kernelPaneProvider);
+            application.RegisterDockablePane(DockablePaneId, "Interactive Revit Kernel", kernelPaneProvider);
 
             //Force loading of assembly
             var activityType = typeof(System.Diagnostics.Activity);
