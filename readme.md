@@ -1,39 +1,42 @@
 # BIM Interactive Notebooks
 
-This is a personal project that explores the possibility to run live Revit C#-scripts inside notebooks bundled with visualizations and narrative text. 
+This project explores the possibility run live Revit API C# code bundled with visualizations and explanatory text.
 
-This has resulted in different parts:
-1. A Revit Addin (Technically a implementation of a NET interactive kernel)
-2. Visual Studio Code Polyglot Notebooks extension
-3. A collection of showcase notebooks (see /samples/) (IN PROGRESS)
+It can be used for rapid prototyping :rocket:- preferably powered by LLM. It is perfect for knowledge sharing, teaching BIM concepts and API development. The variable-sharing feature in NET Interactive lets us code C# against Revit and then use Python in another kernel. It is the missing data-analysis tool for Autodesk Revit!
 
-## Revit addin
-There is a quite stable version of the addin. I am working on an installer.
+## Installation
+A preview release of the addin is available under releases. Revit 2023 and 2024 is supported. 
 
-## System Prompting LLM
-When using CHAT-GPT to write revit API Code for use in the notebook you would probably want to steer it's behaviour to minimize editing the code for use in an interactive context.
-See [System Promts](https://github.com/jowsy/bim-net-interactive/tree/main/samples/system-prompts/) for some initial drafts.
+* Download file msi or zip of the last release
+* Install the Revit addin and open Revit
+* "Interactive Revit Kernel" will show up in the Add-Ins tab
+*  Click on the button to show the Kernel UI.
 
-Begin conversation by:
-> [SYSTEM] {System prompt text}
+You will also need a notebook environment.
+I recommend Polyglot Notebooks, an extension to Visual Studio Code but it is also possible to use Jupyter Notebooks.
 
-## Extension to VS Code Polyglot Notebook
-The idea is to run scripts with [Polyglot Notebook Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.dotnet-interactive-vscode), an extension to Visual Studio Code, a free code editor.
+* Install Visual Studio Code
+* Goto extensions -> Install Polyglot Notebooks
+* Polyglot Notebooks requires .NET 7 SDK
 
-In Visual Studio Code, open a new notebook and create a code cell to enable the revit interaction using the #r directive.
+## My first notebook
+
+* Create a new notebook in VS Code.
+* In Autodesk Revit, click start in the kernel UI
+
+Add a new C#-code cell and install the revit kernel extension.
 ```csharp
 #r "nuget:RevitInteractive"
 ```
 
-Use the #connect-directive to establish live connection to revit. This requires an addin.
+In another cell, use the #connect-directive to establish live connection to revit. Make sure to start the kernel first and specify the revit version.
 ```csharp
-#!connect revit --kernel-name revit24 --revit-version 2024
+#!connect revit --kernel-name revit --revit-version 2024
 ```
 
-Then inside a code cell, execute the code inside Revit using a magic command for the kernel:
-
+From now you'll be able to send code to Revit by starting the c#-cell with #!revit:
 ```csharp
-#!revit24   
+#!revit
 var collector = new FilteredElementCollector( doc, uidoc.ActiveView.Id);
 
 var query = collector
@@ -49,8 +52,17 @@ var result = query.GroupBy(x => x.Category.Name).Select(y => new {
 display(result);
 result
 ```
-## Examples
+If you open a new model, you need to restart kernels in both notebook and in revit.
 
+## System Prompting LLM
+When using LLMs such as ChatGPT to write revit API Code for use in the notebook you would probably want to steer it's behaviour to minimize editing the code for use in an interactive context.
+See [System Promts](https://github.com/jowsy/bim-net-interactive/tree/main/samples/system-prompts/) for some initial drafts.
+
+Begin conversation by:
+> [SYSTEM] {System prompt text}
+
+## Examples
+I will try to collect som fun examples. There is also a collection of tutorials in the folder.
 Extracting profile geometry from floor and export to shapefile for GIS-visualization using C# and Python (with Shapely and Geopandas).
 
 See [samples/GIS/GIS Visualization Building Footprint.ipynb](https://github.com/jowsy/bim-net-interactive/blob/main/samples/GIS/GIS%20Visualization%20Building%20Footprint.ipynb)
