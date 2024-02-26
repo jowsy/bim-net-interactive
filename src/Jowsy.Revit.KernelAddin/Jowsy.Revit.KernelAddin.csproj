@@ -49,6 +49,7 @@
         <PropertyGroup>
             <RootDir>bin\AddIn $(RevitVersion) $(Configuration)\</RootDir>
             <AddinDir>$(RootDir)$(AssemblyName)\</AddinDir>
+            <InstallDir>bin\AddIn $(RevitVersion) $(Configuration) Install\</InstallDir>
         </PropertyGroup>
 
         <Copy SourceFiles="@(RootItem)" DestinationFolder="$(RootDir)"/>
@@ -61,7 +62,8 @@
         </ItemGroup>
         <Message Text="Copy files to Addin folder" Importance="high"/>
         <Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)" Condition="$(Configuration.Contains('Debug'))"/>
+        <Copy SourceFiles="@(RootItem)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\" Condition="$(Configuration.Contains('Debug'))"/>
+        <Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(InstallDir)$(AssemblyName)" Condition="$(Configuration.Contains('Release'))"/>
+        <Copy SourceFiles="@(RootItem)" DestinationFolder="$(InstallDir)" Condition="$(Configuration.Contains('Release'))"/>
     </Target>
-
-
 </Project>
