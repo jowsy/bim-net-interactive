@@ -2,7 +2,7 @@
 
 This project explores the possibility run live Revit API C# code bundled with visualizations and explanatory text.
 
-It can be used for rapid prototyping :rocket:- preferably powered by LLM. It is perfect for knowledge sharing, teaching BIM concepts and API development. The variable-sharing feature in NET Interactive lets us code C# against Revit and then use Python in another kernel. It is the missing data-analysis tool for Autodesk Revit!
+Amazing for rapid prototyping :rocket:- preferably powered by LLM. It is perfect for knowledge sharing, teaching BIM concepts and API development. The variable-sharing feature in NET Interactive lets us code C# against Revit and then use Python in another kernel. It is the missing data-analysis tool for Autodesk Revit!
 
 ## Installation
 A preview release of the addin is available under releases. Revit 2023 and 2024 is supported. 
