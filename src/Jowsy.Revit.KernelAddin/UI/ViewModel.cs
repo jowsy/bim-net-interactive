@@ -1,11 +1,9 @@
-﻿using Autodesk.Revit.UI;
-using Jowsy.Revit.KernelAddin.Core;
+﻿using Jowsy.Revit.KernelAddin.Core;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.Connection;
 using System.Collections.ObjectModel;
 using System.IO.Pipes;
 using System.Reactive.Linq;
-using System.Runtime.Remoting.Contexts;
 
 namespace Jowsy.Revit.KernelAddin.UI
 {
@@ -24,7 +22,9 @@ namespace Jowsy.Revit.KernelAddin.UI
         public KernelStatus KernelStatus
         {
             get { return _kernelStatus; }
-            set { _kernelStatus = value;
+            set
+            {
+                _kernelStatus = value;
                 OnPropertyChanged(nameof(KernelStatus));
                 OnPropertyChanged(nameof(StartButtonEnabled));
             }
@@ -111,7 +111,7 @@ namespace Jowsy.Revit.KernelAddin.UI
             App.KernelInitEventHandler.Tcs = new TaskCompletionSource<bool>();
 
             App.InitKernelEvent.Raise();
-            
+
             await App.KernelInitEventHandler.Tcs.Task;
 
             var uiApp = App.KernelInitEventHandler.UIApplication;
@@ -162,7 +162,7 @@ namespace Jowsy.Revit.KernelAddin.UI
                 var _host = host.ConnectAsync();
                 await SetupInitialVariables();
                 KernelStatus = KernelStatus.Connected;
-               
+
             });
         }
 

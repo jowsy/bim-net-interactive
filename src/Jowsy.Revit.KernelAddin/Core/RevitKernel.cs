@@ -1,23 +1,10 @@
-﻿using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
-using Jowsy.Revit.KernelAddin;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.Commands;
-using Microsoft.DotNet.Interactive.Connection;
-using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.Events;
 using Microsoft.DotNet.Interactive.Formatting;
 using Microsoft.DotNet.Interactive.ValueSharing;
-using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace Jowsy.Revit.KernelAddin.Core
 {
@@ -63,7 +50,7 @@ namespace Jowsy.Revit.KernelAddin.Core
             {
                 _variablesStore.Add(result.Item1, result.Item2);
             }
-            
+
             context.Complete(command);
         }
 
@@ -84,9 +71,9 @@ namespace Jowsy.Revit.KernelAddin.Core
         public Task HandleAsync(RequestValueInfos command, KernelInvocationContext context)
         {
             var valueInfos = _variablesStore.GetVariables()
-                                            .Select(v => 
-                                                    new KernelValueInfo(v.Key,                         
-                                                    CreateSingleFromObject(v.Value, PlainTextSummaryFormatter.MimeType), 
+                                            .Select(v =>
+                                                    new KernelValueInfo(v.Key,
+                                                    CreateSingleFromObject(v.Value, PlainTextSummaryFormatter.MimeType),
                                                     v.Value.GetType()))
                                             .ToArray();
 
@@ -101,7 +88,6 @@ namespace Jowsy.Revit.KernelAddin.Core
             {
                 mimeType = Formatter.GetPreferredMimeTypesFor(value?.GetType()).First();
             }
-
             return new FormattedValue(mimeType, value.ToDisplayString(mimeType));
         }
 

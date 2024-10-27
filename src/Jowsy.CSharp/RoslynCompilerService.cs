@@ -1,20 +1,10 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.DotNet.Interactive.ValueSharing;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Text;
-using Microsoft.CodeAnalysis.Emit;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.DotNet.Interactive.ValueSharing;
-using Microsoft.DotNet.Interactive.Connection;
-using Microsoft.DotNet.Interactive.Commands;
-using Microsoft.DotNet.Interactive.Events;
 
 //See https://github.com/RickStrahl/Westwind.Scripting/blob/master/Westwind.Scripting/CSharpScriptExecution.cs#L1254
 namespace Jowsy.CSharp
@@ -39,7 +29,7 @@ namespace Jowsy.CSharp
 
             string addinPath = Path.Combine(appDataFolder, "Autodesk", "Revit", "Addins", revitVersion, "Jowsy.Revit.KernelAddin");
             AddAssembly(Path.Combine(addinPath, "Jowsy.Revit.KernelAddin.dll"));
-            AddAssembly(Path.Combine(addinPath, "System.Text.Json.dll"));  
+            AddAssembly(Path.Combine(addinPath, "System.Text.Json.dll"));
         }
         public void AddNetFrameworkDefaultReferences(string revitVersion)
         {
@@ -92,19 +82,19 @@ namespace Jowsy.CSharp
         /// <param name="script">C# code</param>
         /// <param name="KernelValueInfosResolver">a resolver for list of kernelvalueinfos</param>
         /// <returns></returns>
-        public async Task<CompilationResults> CompileRevitAddin(string script, bool 
-                                                                toAssemblyFile, 
-                                                                Func<Task<KernelValueInfo[]>>?  KernelValueInfosResolver)
+        public async Task<CompilationResults> CompileRevitAddin(string script, bool
+                                                                toAssemblyFile,
+                                                                Func<Task<KernelValueInfo[]>>? KernelValueInfosResolver)
         {
             var source = SyntaxUtils.BuildClassCode(script);
 
             var tree = CSharpSyntaxTree.ParseText(source.Trim());
 
             var root = (CompilationUnitSyntax)tree.GetRoot();
-            
+
             var tRoot = SyntaxUtils.FixReturn(root);
             var finalTree = CSharpSyntaxTree.Create(tRoot);
-           
+
             var optimizationLevel = OptimizationLevel.Release;
 
             var compilation = CSharpCompilation.Create($"revitkernelgenerated-{DateTime.Today.Ticks}")
@@ -118,31 +108,32 @@ namespace Jowsy.CSharp
 
             GeneratedClassCode = finalTree.ToString();
 
-            if (diagnostics.Any()) {
+            if (diagnostics.Any())
+            {
 
                 if (KernelValueInfosResolver == null)
                 {
-                    throw new ArgumentNullException(nameof(KernelValueInfosResolver));  
+                    throw new ArgumentNullException(nameof(KernelValueInfosResolver));
                 }
 
                 var valueInfos = await KernelValueInfosResolver();
-             
-                    var syntax = SyntaxUtils.ResolveUndeclaredVariables(compilation, valueInfos) as CompilationUnitSyntax;
 
-                    //New try
-                    var newTree = CSharpSyntaxTree.Create(syntax);
-                    compilation = CSharpCompilation.Create($"revitkernelgenerated-{DateTime.Today.Ticks}")
-                        .WithOptions(new CSharpCompilationOptions(
-                                    OutputKind.DynamicallyLinkedLibrary, optimizationLevel: optimizationLevel)
-                        )
-                        .AddReferences(References)
-                        .AddSyntaxTrees(newTree);
+                var syntax = SyntaxUtils.ResolveUndeclaredVariables(compilation, valueInfos) as CompilationUnitSyntax;
 
-                GeneratedClassCode = newTree.ToString();    
+                //New try
+                var newTree = CSharpSyntaxTree.Create(syntax);
+                compilation = CSharpCompilation.Create($"revitkernelgenerated-{DateTime.Today.Ticks}")
+                    .WithOptions(new CSharpCompilationOptions(
+                                OutputKind.DynamicallyLinkedLibrary, optimizationLevel: optimizationLevel)
+                    )
+                    .AddReferences(References)
+                    .AddSyntaxTrees(newTree);
+
+                GeneratedClassCode = newTree.ToString();
 
             }
             //if (SaveGeneratedCode)
-           
+
 
 
             Stream codeStream = null;
@@ -161,16 +152,16 @@ namespace Jowsy.CSharp
 
             codeStream = toAssemblyFile ? new FileStream(outputAssembly, FileMode.Create) :
                                           new MemoryStream();
-           
 
-            
+
+
             using (codeStream)
             {
                 EmitResult compilationResult = null;
 
                 compilationResult = compilation.Emit(codeStream);
 
-     
+
                 // Compilation Error handling
                 if (!compilationResult.Success)
                 {
@@ -219,7 +210,7 @@ namespace Jowsy.CSharp
                 {
                     Success = true,
                     Assembly = assembly
-            };
+                };
             }
 
 

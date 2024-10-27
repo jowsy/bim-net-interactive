@@ -1,12 +1,12 @@
-﻿using System;
-using Installer;
+﻿using Installer;
+using System;
 using WixSharp;
 using WixSharp.CommonTasks;
 using WixSharp.Controls;
 using Assembly = System.Reflection.Assembly;
 
 const string outputName = "RevitInteractiveKernel";
-const string projectName = "RevitInteractiveKernel";
+const string projectName = "Revit Interactive Kernel Addin";
 
 var project = new Project
 {
@@ -15,13 +15,14 @@ var project = new Project
     Platform = Platform.x64,
     UI = WUI.WixUI_FeatureTree,
     MajorUpgrade = MajorUpgrade.Default,
-    GUID = new Guid("9D22EA21-753A-4CBD-AF9E-E0D71CB9CF2D"),
-   //BannerImage = @"install\Resources\Icons\BannerImage.png",
-   // BackgroundImage = @"install\Resources\Icons\BackgroundImage.png",
+    Description = "Enables support for running Revit as an interactive kernel and executing code from a notebook environment such as VS Code Polyglot Notebook.",
+    GUID = new Guid("3A1CED73-19D0-47B2-B127-0F28098FBF2E"),
+    //BannerImage = @"install\Resources\Icons\BannerImage.png",
+    // BackgroundImage = @"install\Resources\Icons\BackgroundImage.png",
     Version = Assembly.GetExecutingAssembly().GetName().Version.ClearRevision(),
     ControlPanelInfo =
     {
-        Manufacturer = "Jowsy"
+        Manufacturer = "Joel Waldheim Saury"
         //ProductIcon = @"install\Resources\Icons\ShellIcon.ico"
     }
 };

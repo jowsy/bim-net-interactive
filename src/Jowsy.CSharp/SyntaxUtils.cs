@@ -1,13 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.DotNet.Interactive.ValueSharing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jowsy.CSharp
 {
@@ -45,14 +39,14 @@ namespace Jowsy.Revit.KernelAddin.Core
         }
     }
 }";
-        
+
         public static CompilationUnitSyntax GenerateCodeCommand(string script)
         {
 
             var source = BuildClassCode(script);
 
             var tree = CSharpSyntaxTree.ParseText(source);
-            
+
             var root = (CompilationUnitSyntax)tree.GetRoot().NormalizeWhitespace();
 
             return root;

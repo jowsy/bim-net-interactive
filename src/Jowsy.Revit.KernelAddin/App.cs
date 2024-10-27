@@ -26,10 +26,10 @@ namespace Jowsy.Revit.KernelAddin
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-            var ribbonPanel = application.CreateRibbonPanel("NET Interactive");
+            var ribbonPanel = application.CreateRibbonPanel("Interactive Revit Kernel");
 
             var showCommand = typeof(ShowCommand);
-            var showButtonData = new PushButtonData(showCommand.FullName, "Show\nDockable Pane)", Assembly.GetAssembly(showCommand).Location, showCommand.FullName);
+            var showButtonData = new PushButtonData(showCommand.FullName, "Show\nDockable Pane", Assembly.GetAssembly(showCommand).Location, showCommand.FullName);
             ribbonPanel.AddItem(showButtonData);
 
             KernelEventHandler = new RevitKernelExternalEventHandler();
@@ -40,10 +40,13 @@ namespace Jowsy.Revit.KernelAddin
 
             var kernelPaneProvider = new KernelDockablePaneProvider(new ViewModel(application.ControlledApplication.VersionNumber));
 
-            application.RegisterDockablePane(DockablePaneId, "NETInteractive Revit Kernel", kernelPaneProvider);
+            application.RegisterDockablePane(DockablePaneId, "Interactive Revit Kernel", kernelPaneProvider);
+
+            //Force loading of assembly
+            var activityType = typeof(System.Diagnostics.Activity);
 
             //TODO: Implement a better formatter! Maybe based on RevitLookup?
-           Formatter.SetPreferredMimeTypesFor(typeof(Element), "text/html");
+            Formatter.SetPreferredMimeTypesFor(typeof(Element), "text/html");
 
             //It's common for object graphs to contain reference cycles.
             //The .NET Interactive formatter will traverse object graphs but in order to avoid both oversized outputs and possible
@@ -51,27 +54,14 @@ namespace Jowsy.Revit.KernelAddin
             Formatter.RecursionLimit = 3;
             return Result.Succeeded;
         }
-        Assembly CurrentDomain_AssemblyResolve(object sender,ResolveEventArgs args)
+        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            try
+            // load the assembly from the embedded resources
+            string folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string assemblyPath = Path.Combine(folder, new AssemblyName(args.Name).Name + ".dll");
+            if (File.Exists(assemblyPath))
             {
-                if (args.Name.Contains("Encodings") || args.Name.Contains("Retro") || args.Name.Contains("GridExtensions"))
-                {
-                    string filename = Path.GetDirectoryName(typeof(ViewModel).Assembly.Location);
-
-                    filename = Path.Combine(filename,
-                      args.Name.Split(',').FirstOrDefault() + ".dll");
-
-                    if (File.Exists(filename))
-                    {
-                        return Assembly
-                          .LoadFrom(filename);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-
+                return Assembly.LoadFrom(assemblyPath);
             }
             return null;
         }

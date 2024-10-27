@@ -1,12 +1,5 @@
-﻿using Elfie.Serialization;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Jowsy.CSharp.Tests
 {
@@ -15,11 +8,11 @@ namespace Jowsy.CSharp.Tests
 
         private ReferenceList _references;
         private ReferenceList GetMetadataReferences()
-        {        
-                if (_references == null)
-                {
+        {
+            if (_references == null)
+            {
                 InitReferences();
-                }
+            }
             return _references;
         }
 
